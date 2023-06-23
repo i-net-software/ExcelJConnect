@@ -36,7 +36,7 @@ public class ExcelDriver implements Driver {
     @Override
     public Connection connect( String url, Properties info ) throws SQLException {
         // TODO check whether url is accepted
-        ExcelParser parser = new ExcelParser( Paths.get( "D:\\excel_driver_tests\\test.xlsx" ) ); //TODO
+        ExcelParser parser = new ExcelParser( Paths.get( "D:\\excel_driver_tests\\test.xlsx" ), true ); //TODO
         return new ExcelConnection( parser );
     }
 

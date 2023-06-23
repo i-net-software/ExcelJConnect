@@ -17,13 +17,14 @@ package com.inet.excel;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
-public class ExcelResultSetMetaData implements ResultSetMetaData {
+public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
 
     private List<String> columnNames;
 
-    public ExcelResultSetMetaData( List<String> columnNames ) {
+    public ExcelSheetResultSetMetaData( List<String> columnNames ) {
         //TODO ensure list is not null
         this.columnNames = columnNames;
     }
@@ -42,7 +43,6 @@ public class ExcelResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public int getColumnCount() throws SQLException {
-        // TODO Auto-generated method stub
         return columnNames.size();
     }
 
@@ -66,19 +66,16 @@ public class ExcelResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public boolean isCurrency( int column ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public int isNullable( int column ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return columnNoNulls;
     }
 
     @Override
     public boolean isSigned( int column ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -90,31 +87,26 @@ public class ExcelResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public String getColumnLabel( int column ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getColumnName( column );
     }
 
     @Override
     public String getColumnName( int column ) throws SQLException {
-        // TODO Auto-generated method stub
-        return columnNames.get( column );
+        return columnNames.get( column - 1 );
     }
 
     @Override
     public String getSchemaName( int column ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public int getPrecision( int column ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return ExcelDatabaseMetaData.VARCHAR_COLUMN_SIZE_IN_BYTES;
     }
 
     @Override
     public int getScale( int column ) throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -132,31 +124,26 @@ public class ExcelResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public int getColumnType( int column ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return Types.VARCHAR;
     }
 
     @Override
     public String getColumnTypeName( int column ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return "VARCHAR";
     }
 
     @Override
     public boolean isReadOnly( int column ) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override
     public boolean isWritable( int column ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean isDefinitelyWritable( int column ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -165,5 +152,4 @@ public class ExcelResultSetMetaData implements ResultSetMetaData {
         // TODO Auto-generated method stub
         return null;
     }
-
 }

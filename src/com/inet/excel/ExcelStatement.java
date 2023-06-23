@@ -20,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.ArrayList;
 
 public class ExcelStatement implements Statement {
 
@@ -40,7 +39,7 @@ public class ExcelStatement implements Statement {
     public ResultSet executeQuery( String sql ) throws SQLException {
         // TODO Auto-generated method stub
         System.out.println( "executeQuery: " + sql );
-        return new ExcelResultSet( new ArrayList<>(), new ArrayList<>() );
+        throw new SQLException(); //TODO
     }
 
     @Override

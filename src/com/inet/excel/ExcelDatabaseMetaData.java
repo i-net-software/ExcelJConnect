@@ -29,46 +29,20 @@ import com.inet.excel.parser.ExcelParser;
 
 public class ExcelDatabaseMetaData implements DatabaseMetaData {
 
+    public static final int VARCHAR_COLUMN_SIZE_IN_BYTES = 65535;
+
     public static final String PRODUCT_NAME = "inetexcel";
 
     private final ExcelParser parser;
-    private final boolean hasHeaderRow;
 
     public ExcelDatabaseMetaData( ExcelParser parser ) {
-        this( parser, true );
-    }
-
-    public ExcelDatabaseMetaData( ExcelParser parser, boolean hasHeaderRow ) {
         this.parser = parser;
-        this.hasHeaderRow = hasHeaderRow;
     }
 
     @Override
     public ResultSet getTables( String catalog, String schemaPattern, String tableNamePattern, String[] types ) throws SQLException {
         List<String> columnNames = Arrays.asList( "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "TABLE_TYPE", "REMARKS", "TYPE_CAT", "TYPE_SCHEM", "TYPE_NAME", "SELF_REFERENCING_COL_NAME", "REF_GENERATION" );
-        List<List<Object>> rows = new ArrayList<>();
-
-        try {
-            for( String sheetName : parser.getSheetNames() ) {
-                List<Object> row = new ArrayList<>();
-                row.add( parser.getFileName() );
-                row.add( null );
-                row.add( sheetName );
-                row.add( "TABLE" );
-                row.add( null );
-                row.add( null );
-                row.add( null );
-                row.add( null );
-                row.add( null );
-                row.add( null );
-
-                rows.add( row );
-            }
-        } catch( Exception ex ) {
-            throw new SQLException( ex ); //TODO
-        }
-
-        return new ExcelResultSet( columnNames, rows );
+        return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
     @Override
@@ -77,52 +51,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
                                                   "DECIMAL_DIGITS", "NUM_PREC_RADIX", "NULLABLE", "REMARKS", "COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", //
                                                   "CHAR_OCTET_LENGTH", "ORDINAL_POSITION", "IS_NULLABLE", "SCOPE_CATALOG", "SCOPE_SCHEMA", "SCOPE_TABLE", //
                                                   "SOURCE_DATA_TYPE", "IS_AUTOINCREMENT", "IS_GENERATEDCOLUMN" );
-        List<List<Object>> allRows = new ArrayList<>();
-
-        //TODO return only data of columns matched by specified patterns
-
-        try {
-            for( String sheetName : parser.getSheetNames() ) {
-
-                int colSize = 65535;
-                int colIndex = 0;
-                for( String colName : parser.getColumnNames( sheetName, hasHeaderRow ) ) {
-                    colIndex++; // indexing starts with 1
-
-                    List<Object> row = new ArrayList<>();
-                    row.add( parser.getFileName() );
-                    row.add( null );
-                    row.add( sheetName );
-                    row.add( colName );
-                    row.add( Integer.valueOf( Types.VARCHAR ) );
-                    row.add( "VARCHAR" );
-                    row.add( Integer.valueOf( colSize ) );
-                    row.add( null );
-                    row.add( Integer.valueOf( 0 ) );
-                    row.add( Integer.valueOf( 10 ) );
-                    row.add( Integer.valueOf( DatabaseMetaData.columnNullable ) );
-                    row.add( null );
-                    row.add( null );
-                    row.add( null );
-                    row.add( null );
-                    row.add( Integer.valueOf( colSize ) );
-                    row.add( Integer.valueOf( colIndex ) );
-                    row.add( "YES" );
-                    row.add( null );
-                    row.add( null );
-                    row.add( null );
-                    row.add( null );
-                    row.add( "" );
-                    row.add( "" );
-
-                    allRows.add( row );
-                }
-            }
-        } catch( Exception ex ) {
-            throw new SQLException( ex ); //TODO
-        }
-
-        return new ExcelResultSet( columnNames, allRows );
+        return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
     @Override
@@ -847,14 +776,79 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public ResultSet getProcedures( String catalog, String schemaPattern, String procedureNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> columnNames = Arrays.asList( "PROCEDURE_CAT", "PROCEDURE_SCHEM", "PROCEDURE_NAME", //
+                                                  "reserved for future use 1", "reserved for future use 2", "reserved for future use 3",
+                                                  "REMARKS", "PROCEDURE_TYPE", "SPECIFIC_NAME" );
+        List<List<Object>> allRows = new ArrayList<>();
+
+        try {
+            for( String sheetName : parser.getSheetNames() ) {
+                List<Object> row = new ArrayList<>();
+                row.add( parser.getFileName() );
+                row.add( null );
+                row.add( sheetName );
+                row.add( null );
+                row.add( null );
+                row.add( null );
+                row.add( "" );
+                row.add( Integer.valueOf( DatabaseMetaData.procedureReturnsResult ) );
+                row.add( null );
+
+                allRows.add( row );
+            }
+        } catch( Exception ex ) {
+            throw new SQLException( ex );
+        }
+
+        return new ExcelDatabaseResultSet( columnNames, allRows );
     }
 
     @Override
     public ResultSet getProcedureColumns( String catalog, String schemaPattern, String procedureNamePattern, String columnNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> columnNames = Arrays.asList( "PROCEDURE_CAT", "PROCEDURE_SCHEM", "PROCEDURE_NAME", "COLUMN_NAME", "COLUMN_TYPE", //
+                                                  "DATA_TYPE", "TYPE_NAME", "PRECISION", "LENGTH", "SCALE", "RADIX", "NULLABLE", //
+                                                  "REMARKS", "COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", //
+                                                  "ORDINAL_POSITION", "IS_NULLABLE", "SPECIFIC_NAME" );
+        List<List<Object>> allRows = new ArrayList<>();
+
+        //TODO return only data of columns matched by specified patterns
+
+        try {
+            for( String sheetName : parser.getSheetNames() ) {
+                int colIndex = 0;
+                for( String colName : parser.getColumnNames( sheetName ) ) {
+                    colIndex++; // indexing starts with 1
+
+                    List<Object> row = new ArrayList<>();
+                    row.add( parser.getFileName() );
+                    row.add( null );
+                    row.add( sheetName );
+                    row.add( colName );
+                    row.add( Integer.valueOf( DatabaseMetaData.procedureColumnResult ) );
+                    row.add( Integer.valueOf( Types.VARCHAR ) );
+                    row.add( "VARCHAR" );
+                    row.add( Integer.valueOf( 0 ) );
+                    row.add( Integer.valueOf( VARCHAR_COLUMN_SIZE_IN_BYTES ) );
+                    row.add( Integer.valueOf( VARCHAR_COLUMN_SIZE_IN_BYTES ) );
+                    row.add( null );
+                    row.add( Integer.valueOf( DatabaseMetaData.procedureNoNulls ) );
+                    row.add( "" );
+                    row.add( "" );
+                    row.add( null );
+                    row.add( null );
+                    row.add( Integer.valueOf( VARCHAR_COLUMN_SIZE_IN_BYTES ) );
+                    row.add( Integer.valueOf( colIndex ) );
+                    row.add( "NO" );
+                    row.add( sheetName );
+
+                    allRows.add( row );
+                }
+            }
+        } catch( Exception ex ) {
+            throw new SQLException( ex );
+        }
+
+        return new ExcelDatabaseResultSet( columnNames, allRows );
     }
 
     @Override

@@ -18,14 +18,41 @@ package com.inet.excel.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Container for data of cells belonging to single row.
+ */
 public class RowData {
 
+    private int rowIndex;
     private List<CellData> cellsInRow = new ArrayList<>();
 
+    /** Creates instance representing row with specified index.
+     * @param rowIndex index of the row. Minimum value is 1.
+     * @throws IllegalArgumentException if specified index is smaller than 1.
+     */
+    public RowData( int rowIndex ) {
+        if( rowIndex < 1 ) {
+            throw new IllegalArgumentException( "index must be greater than zero" );
+        }
+        this.rowIndex = rowIndex;
+    }
+
+    /** Returns index of the row. Minimum value is 1.
+     * @return index of the row.
+     */
+    public int getRowIndex() {
+        return rowIndex;
+    }
+
+    /** Adds data of cell belonging to the row, which is represented by this container.
+     * @param cellData data of the cell.
+     */
     public void addCellData( CellData cellData ) {
         cellsInRow.add( cellData );
     }
 
+    /** Returns list of all cell data included in this container.
+     * @return list of all cell data included in this container.
+     */
     public List<CellData> getCellsInRow() {
         return cellsInRow;
     }

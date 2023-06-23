@@ -80,6 +80,19 @@ public class ExcelConnection implements Connection {
     @Override
     public CallableStatement prepareCall( String sql ) throws SQLException {
         // TODO Auto-generated method stub
+        String procedureName = null;
+
+        if( sql != null && sql.startsWith( "{call " ) ) {
+            if( sql.endsWith( "()}" ) ) {
+                procedureName = sql.substring( 6, sql.length() - 3 );
+            } else if( sql.endsWith( "}" ) ) {
+                procedureName = sql.substring( 6, sql.length() - 1 );
+            }
+        }
+
+        if( procedureName != null ) {
+            return new ExcelCallableStatement( parser, procedureName );
+        }
         return null;
     }
 

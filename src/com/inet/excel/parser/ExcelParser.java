@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -41,19 +42,24 @@ public class ExcelParser {
 
     private final XMLInputFactory factory = XMLInputFactory.newInstance();
     private final Path filePath;
+    private final boolean hasHeaderRow;
 
     private List<String> sharedStrings = null;
     private Map<String, String> sheetNamesToPaths = null;
+    private Map<String, SheetDimension> sheetNamesToDimensions = new HashMap<>();
+    private Map<String, List<String>> sheetNamesToColumnNames = new HashMap<>();
 
     /** Creates instance responsible for reading data from specified Excel document.
      * @param filePath file path to Excel document.
+     * @param hasHeaderRow whether first row in sheet represents column headers. 
      * @throws IllegalArgumentException if file path is null.
      */
-    public ExcelParser( Path filePath ) {
+    public ExcelParser( Path filePath, boolean hasHeaderRow ) {
         if( filePath == null ) {
             throw new IllegalArgumentException( "filePath must not be null" );
         }
         this.filePath = filePath;
+        this.hasHeaderRow = hasHeaderRow;
     }
 
     /** Exception that may be thrown when I/O or processing errors occur while reading data from Excel document.
@@ -80,14 +86,14 @@ public class ExcelParser {
      * In case of cells in column header row, which have no values, column names will be auto-generated.
      * If sheet does not contain row representing column headers, all column names will be auto-generated.
      * @param sheetName name of the sheet from Excel document.
-     * @param hasHeaderRow whether first row of specified sheet represents column headers. 
      * @return list containing names of columns from specified sheet.
      * @throws ExcelParserException in case of I/O or processing errors.
      */
-    public List<String> getColumnNames( String sheetName, boolean hasHeaderRow ) {
+    public List<String> getColumnNames( String sheetName ) {
         try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
             initSheetData( zipFile );
-            return readColumnNames( zipFile, sheetName, hasHeaderRow );
+            initDimensionAndColumnNames( zipFile, sheetName );
+            return Collections.unmodifiableList( sheetNamesToColumnNames.get( sheetName ) );
         } catch( IOException ex ) {
             throw new ExcelParserException( ex );
         }
@@ -101,6 +107,49 @@ public class ExcelParser {
         try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
             initSheetData( zipFile );
             return sheetNamesToPaths.entrySet().stream().sorted( Map.Entry.comparingByValue() ).map( Map.Entry::getKey ).collect( Collectors.toList() );
+        } catch( IOException ex ) {
+            throw new ExcelParserException( ex );
+        }
+    }
+
+    /** Returns number of rows included in specified sheet from Excel document.
+     * @param sheetName name of the sheet from Excel document.
+     * @return number of rows included in specified sheet from Excel document.
+     * @throws ExcelParserException in case of I/O or processing errors.
+     */
+    public int getRowCount( String sheetName ) {
+        try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
+            initSheetData( zipFile );
+            return readRowCount( zipFile, sheetName );
+        } catch( IOException ex ) {
+            throw new ExcelParserException( ex );
+        }
+    }
+
+    /** Returns list of rows from specified range. Every element in resulting list represents cell values from single row.
+     * Resulting list contains data of rows in order of their occurrence in the sheet. Cells with no values are represented as empty strings.
+     * @param sheetName name of the sheet from Excel document.
+     * @param firstRowIndex index of the first row, which should be included in the list.
+     * @param lastRowIndex index of the last row, which should be included in the list.
+     * @return list of rows from specified range.
+     * @throws IllegalArgumentException if one of specified indexes is smaller than 1; if first index is greater than last index.
+     * @throws ExcelParserException in case of I/O or processing errors.
+     */
+    public List<List<String>> getRows( String sheetName, int firstRowIndex, int lastRowIndex ) {
+        if( firstRowIndex < 1 ) {
+            throw new IllegalArgumentException( "firstRowIndex must be greater than zero" );
+        }
+        if( lastRowIndex < 1 ) {
+            throw new IllegalArgumentException( "lastRowIndex must be greater than zero" );
+        }
+        if( firstRowIndex > lastRowIndex ) {
+            throw new IllegalArgumentException( "firstRowIndex  must be smaller than or equal to lastRowIndex" );
+        }
+
+        try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
+            initSheetData( zipFile );
+            initDimensionAndColumnNames( zipFile, sheetName );
+            return readRows( zipFile, sheetName, firstRowIndex, lastRowIndex );
         } catch( IOException ex ) {
             throw new ExcelParserException( ex );
         }
@@ -202,25 +251,36 @@ public class ExcelParser {
         }
     }
 
-    /** Reads names of columns from specified sheet.
+    /** Returns zip file entry for specified sheet or throws exception if such sheet does not exist inside Excel document.
      * @param zipFile component allowing access to data inside Excel document.
      * @param sheetName name of the sheet from Excel document.
-     * @param hasHeaderRow whether first row of specified sheet represents column headers. 
-     * @return list containing names of columns from specified sheet.
+     * @return zip file entry for specified sheet.
+     * @throws ExcelParserException if specified sheet does not exist inside Excel document.
+     */
+    private ZipEntry getZipEntryForSheet( ZipFile zipFile, String sheetName ) {
+        ZipEntry sheetEntry = null;
+        String sheetPath = sheetNamesToPaths.get( sheetName );
+        if( sheetPath != null ) {
+            sheetEntry = zipFile.getEntry( sheetPath );
+        }
+        if( sheetEntry == null ) {
+            String msg = "There is no sheet with name \"" + sheetName + "\".";
+            throw new ExcelParserException( new IllegalArgumentException( msg ) ); //TODO rethink exception type
+        }
+        return sheetEntry;
+    }
+
+    /** Initializes dimension and list of column names from specified sheet.
+     * @param zipFile component allowing access to data inside Excel document.
+     * @param sheetName name of the sheet from Excel document.
      * @throws ExcelParserException in case of I/O or processing errors.
      */
-    private List<String> readColumnNames( ZipFile zipFile, String sheetName, boolean hasHeaderRow ) {
+    private void initDimensionAndColumnNames( ZipFile zipFile, String sheetName ) {
+        if( sheetNamesToDimensions.get( sheetName ) != null && sheetNamesToColumnNames.get( sheetName ) != null ) {
+            return;
+        }
         try {
-            ZipEntry sheetEntry = null;
-            String sheetPath = sheetNamesToPaths.get( sheetName );
-            if( sheetPath != null ) {
-                sheetEntry = zipFile.getEntry( sheetPath );
-            }
-            if( sheetEntry == null ) {
-                String msg = "There is no sheet with name \"" + sheetName + "\".";
-                throw new ExcelParserException( new IllegalArgumentException( msg ) ); //TODO rethink exception type
-            }
-
+            ZipEntry sheetEntry = getZipEntryForSheet( zipFile, sheetName );
             try( InputStream is = zipFile.getInputStream( sheetEntry ) ) {
                 XMLStreamReader reader = factory.createXMLStreamReader( is );
                 try {
@@ -228,7 +288,7 @@ public class ExcelParser {
                     boolean insideHeaderRow = false;
                     boolean collectCellRefs = false;
 
-                    RowData headerData = new RowData();
+                    RowData headerData = new RowData( 1 );
                     CellData currentCellData = null;
                     SheetDimension sheetDimension = null;
                     RowSpanData rowSpan = new RowSpanData();
@@ -298,7 +358,10 @@ public class ExcelParser {
 
                     if( sheetDimension == null ) {
                         if( rowSpan.isEmpty() ) {
-                            return Collections.singletonList( "C1" ); // sheet is empty
+                            // sheet is empty
+                            sheetNamesToDimensions.put( sheetName, new SheetDimension( 1, 1 ) );
+                            sheetNamesToColumnNames.put( sheetName, Collections.singletonList( "C1" ) );
+                            return;
                         } else {
                             sheetDimension = new SheetDimension( rowSpan.getFirstColumnIndex(), rowSpan.getLastColumnIndex() );
                         }
@@ -306,31 +369,21 @@ public class ExcelParser {
                     List<String> columnNames = generateColumnNames( sheetDimension.getFirstColumnIndex(), sheetDimension.getLastColumnIndex() );
 
                     for( CellData cell : headerData.getCellsInRow() ) { // NOTE: relevant only if hasHeaderRow is true
-                        String value = null;
-
-                        if( "s".equals( cell.getT() ) ) {
-                            try {
-                                int index = Integer.parseInt( cell.getV() );
-                                initSharedStrings( zipFile );
-                                value = sharedStrings.get( index );
-                            } catch( NumberFormatException ex ) {
-                                // error can be ignored -> column is going to get auto-generated name
-                            }
-                        } else {
-                            //TODO format cell value
+                        String value = getCellValue( zipFile, cell );
+                        if( value == null ) {
+                            continue;
                         }
-
-                        if( value != null ) {
-                            int columnIndex = SheetDimension.getColumnIndexFromCellRef( cell.getR() );
-                            if( columnIndex > 0 ) { // ensures that cell ref is valid
-                                columnIndex -= sheetDimension.getFirstColumnIndex();
-                                if( columnIndex >= 0 && columnIndex < columnNames.size() ) {
-                                    columnNames.set( columnIndex, value );
-                                }
+                        int columnIndex = SheetDimension.getColumnIndexFromCellRef( cell.getR() );
+                        if( columnIndex > 0 ) { // ensures that cell ref is valid
+                            columnIndex -= sheetDimension.getFirstColumnIndex();
+                            if( columnIndex >= 0 && columnIndex < columnNames.size() ) {
+                                columnNames.set( columnIndex, value );
                             }
                         }
                     }
-                    return columnNames;
+                    sheetNamesToDimensions.put( sheetName, sheetDimension );
+                    sheetNamesToColumnNames.put( sheetName, columnNames );
+                    return;
                 } finally {
                     reader.close();
                 }
@@ -351,5 +404,160 @@ public class ExcelParser {
             columnNames.add( "C" + index );
         }
         return columnNames;
+    }
+
+    /** Returns list of rows from specified range. Every element in resulting list represents cell values from single row.
+     * Resulting list contains data of rows in order of their occurrence in the sheet. Cells with no values are represented as empty strings.
+     * @param zipFile component allowing access to data inside Excel document.
+     * @param sheetName name of the sheet from Excel document.
+     * @param firstRowIndex index of the first row, which should be included in the list.
+     * @param lastRowIndex index of the last row, which should be included in the list.
+     * @return list of rows from specified range.
+     * @throws ExcelParserException in case of I/O or processing errors.
+     */
+    private List<List<String>> readRows( ZipFile zipFile, String sheetName, int firstRowIndex, int lastRowIndex ) {
+        try {
+            ZipEntry sheetEntry = getZipEntryForSheet( zipFile, sheetName );
+            try( InputStream is = zipFile.getInputStream( sheetEntry ) ) {
+                XMLStreamReader reader = factory.createXMLStreamReader( is );
+                try {
+                    int requestedRowCount = lastRowIndex - firstRowIndex + 1;
+                    int columnCount = sheetNamesToColumnNames.get( sheetName ).size();
+                    SheetDimension sheetDimension = sheetNamesToDimensions.get( sheetName );
+
+                    List<List<String>> allRows = new ArrayList<>();
+                    IntStream.range( 0, requestedRowCount ).forEach( val -> {
+                        List<String> row = new ArrayList<>();
+                        IntStream.range( 0, columnCount ).forEach( v -> row.add( "" ) );
+                        allRows.add( row );
+                    } );
+
+                    RowData currentRowData = null;
+                    CellData currentCellData = null;
+
+                    while( reader.hasNext() ) {
+                        reader.next();
+                        if( reader.getEventType() == XMLStreamReader.START_ELEMENT ) {
+                            String localName = reader.getLocalName();
+                            if( localName == null ) {
+                                continue;
+                            }
+                            switch( localName ) {
+                                case "row":
+                                    try {
+                                        int rowIndex = Integer.parseInt( reader.getAttributeValue( null, "r" ) );
+                                        if( rowIndex >= firstRowIndex && rowIndex <= lastRowIndex ) {
+                                            currentRowData = new RowData( rowIndex );
+                                        }
+                                    } catch( Exception ex ) {
+                                        // ignore row if index can not be parsed
+                                    }
+                                    break;
+                                case "c":
+                                    if( currentRowData != null ) {
+                                        currentCellData = new CellData();
+                                        currentCellData.setR( reader.getAttributeValue( null, "r" ) );
+                                        currentCellData.setT( reader.getAttributeValue( null, "t" ) );
+                                        currentCellData.setS( reader.getAttributeValue( null, "s" ) );
+                                    }
+                                    break;
+                                case "v":
+                                    if( currentRowData != null ) {
+                                        currentCellData.setV( reader.getElementText() );
+                                        currentRowData.addCellData( currentCellData );
+                                        currentCellData = null;
+                                    }
+                                    break;
+                            }
+                        } else if( reader.getEventType() == XMLStreamReader.END_ELEMENT ) {
+                            String localName = reader.getLocalName();
+                            if( "row".equals( localName ) ) {
+                                if( currentRowData != null ) {
+                                    List<String> row = allRows.get( currentRowData.getRowIndex() - firstRowIndex );
+
+                                    for( CellData cell : currentRowData.getCellsInRow() ) {
+                                        String value = getCellValue( zipFile, cell );
+                                        if( value == null ) {
+                                            continue;
+                                        }
+
+                                        int columnIndex = SheetDimension.getColumnIndexFromCellRef( cell.getR() );
+                                        if( columnIndex > 0 ) { // ensures that cell ref is valid
+                                            columnIndex -= sheetDimension.getFirstColumnIndex();
+                                            if( columnIndex >= 0 && columnIndex < columnCount ) {
+                                                row.set( columnIndex, value );
+                                            }
+                                        }
+                                    }
+                                    currentRowData = null;
+                                }
+                            }
+                        }
+                    }
+                    return allRows;
+                } finally {
+                    reader.close();
+                }
+            }
+        } catch( XMLStreamException | IOException ex ) {
+            throw new ExcelParserException( ex );
+        }
+    }
+
+    /** Returns value of specified cell.
+     * @param zipFile component allowing access to data inside Excel document.
+     * @param cell container with data of the cell.
+     * @return value of specified cell or null, in case of invalid data.
+     */
+    private String getCellValue( ZipFile zipFile, CellData cell ) {
+        if( "s".equals( cell.getT() ) ) {
+            try {
+                int index = Integer.parseInt( cell.getV() );
+                initSharedStrings( zipFile );
+                return sharedStrings.get( index );
+            } catch( NumberFormatException ex ) {
+                return null;
+            }
+        } else {
+            return null;//TODO format cell value
+        }
+    }
+
+    /** Returns number of rows included in specified sheet from Excel document.
+     * @param zipFile component allowing access to data inside Excel document.
+     * @param sheetName name of the sheet from Excel document.
+     * @return number of rows included in specified sheet from Excel document.
+     * @throws ExcelParserException in case of I/O or processing errors.
+     */
+    private int readRowCount( ZipFile zipFile, String sheetName ) {
+        try {
+            ZipEntry sheetEntry = getZipEntryForSheet( zipFile, sheetName );
+            try( InputStream is = zipFile.getInputStream( sheetEntry ) ) {
+                XMLStreamReader reader = factory.createXMLStreamReader( is );
+                try {
+                    int rowCount = 0;
+                    while( reader.hasNext() ) {
+                        reader.next();
+                        if( reader.getEventType() == XMLStreamReader.START_ELEMENT ) {
+                            if( "row".equals( reader.getLocalName() ) ) {
+                                try {
+                                    int rowIndex = Integer.parseInt( reader.getAttributeValue( null, "r" ) );
+                                    if( rowIndex > rowCount ) {
+                                        rowCount = rowIndex;
+                                    }
+                                } catch( Exception ex ) {
+                                    // ignore row if index can not be parsed
+                                }
+                            }
+                        }
+                    }
+                    return rowCount;
+                } finally {
+                    reader.close();
+                }
+            }
+        } catch( XMLStreamException | IOException ex ) {
+            throw new ExcelParserException( ex );
+        }
     }
 }

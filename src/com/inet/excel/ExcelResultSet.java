@@ -26,7 +26,6 @@ import java.sql.Date;
 import java.sql.NClob;
 import java.sql.Ref;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -35,38 +34,36 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-public class ExcelResultSet implements ResultSet {
+public abstract class ExcelResultSet implements ResultSet {
 
-    private List<String> columnNames;
-    private List<List<Object>> rows;
-    private int currentRowIndex;
+    private final List<String> columnNames;
 
-    public ExcelResultSet( List<String> columnNames, List<List<Object>> rows ) {
-        this.columnNames = columnNames;
-        this.rows = rows;
-        this.currentRowIndex = -1;
+    public ExcelResultSet( List<String> columnNames ) {
+        this.columnNames = Collections.unmodifiableList( columnNames );
     }
 
-    private void throwIfAlreadyClosed() throws SQLException {
-        if( rows == null ) {
+    abstract protected <T> T getValue( int columnIndex ) throws SQLException;
+
+    protected void throwIfAlreadyClosed() throws SQLException {
+        if( isClosed() ) {
             throw new SQLException( "ResultSet: already closed" );
         }
     }
 
-    private void throwIfAlreadyClosedOrReachedEnd() throws SQLException {
+    protected void throwIfAlreadyClosedOrReachedEnd() throws SQLException {
         throwIfAlreadyClosed();
-        if( currentRowIndex >= rows.size() ) {
+        if( isAfterLast() ) {
             throw new SQLException( "ResultSet: already reached end" );
         }
     }
 
-    @Override
-    public ResultSetMetaData getMetaData() throws SQLException {
-        // TODO Auto-generated method stub
-        return new ExcelResultSetMetaData( columnNames );
+    protected List<String> getColumnNames() {
+        return columnNames;
     }
 
     @Override
@@ -82,22 +79,6 @@ public class ExcelResultSet implements ResultSet {
     }
 
     @Override
-    public boolean next() throws SQLException {
-        throwIfAlreadyClosed();
-        currentRowIndex++;
-        if( currentRowIndex >= rows.size() ) {
-            currentRowIndex = rows.size();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void close() throws SQLException {
-        rows = null;
-    }
-
-    @Override
     public boolean wasNull() throws SQLException {
         // TODO Auto-generated method stub
         return false;
@@ -105,80 +86,67 @@ public class ExcelResultSet implements ResultSet {
 
     @Override
     public String getString( int columnIndex ) throws SQLException {
-        throwIfAlreadyClosedOrReachedEnd();
-        return (String)rows.get( currentRowIndex ).get( columnIndex - 1 );
+        return getValue( columnIndex  );
     }
 
     @Override
     public boolean getBoolean( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return getValue( columnIndex );
     }
 
     @Override
     public byte getByte( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return getValue( columnIndex );
     }
 
     @Override
     public short getShort( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return getValue( columnIndex );
     }
 
     @Override
     public int getInt( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return getValue( columnIndex );
     }
 
     @Override
     public long getLong( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return getValue( columnIndex );
     }
 
     @Override
     public float getFloat( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return getValue( columnIndex );
     }
 
     @Override
     public double getDouble( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return getValue( columnIndex );
     }
 
     @Override
     public BigDecimal getBigDecimal( int columnIndex, int scale ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getValue( columnIndex );
     }
 
     @Override
     public byte[] getBytes( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getValue( columnIndex );
     }
 
     @Override
     public Date getDate( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getValue( columnIndex );
     }
 
     @Override
     public Time getTime( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getValue( columnIndex );
     }
 
     @Override
     public Timestamp getTimestamp( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getValue( columnIndex );
     }
 
     @Override
@@ -201,50 +169,50 @@ public class ExcelResultSet implements ResultSet {
 
     @Override
     public String getString( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public boolean getBoolean( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public byte getByte( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public short getShort( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public int getInt( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public long getLong( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public float getFloat( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public double getDouble( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
@@ -255,26 +223,26 @@ public class ExcelResultSet implements ResultSet {
 
     @Override
     public byte[] getBytes( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public Date getDate( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public Time getTime( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public Timestamp getTimestamp( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
@@ -315,20 +283,24 @@ public class ExcelResultSet implements ResultSet {
 
     @Override
     public Object getObject( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getValue( columnIndex );
     }
 
     @Override
     public Object getObject( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public int findColumn( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        throwIfAlreadyClosed();
+        for( int index = 0; index < columnNames.size(); index++ ) {
+            if( Objects.equals( columnLabel, columnNames.get( index ) ) ) {
+                return index + 1;
+            }
+        }
+        throw new SQLException(); //TODO
     }
 
     @Override
@@ -339,30 +311,23 @@ public class ExcelResultSet implements ResultSet {
 
     @Override
     public Reader getCharacterStream( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public BigDecimal getBigDecimal( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getValue( columnIndex );
     }
 
     @Override
     public BigDecimal getBigDecimal( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        int columnIndex = findColumn( columnLabel );
+        return getValue( columnIndex );
     }
 
     @Override
     public boolean isBeforeFirst() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isAfterLast() throws SQLException {
         // TODO Auto-generated method stub
         return false;
     }
@@ -401,12 +366,6 @@ public class ExcelResultSet implements ResultSet {
     public boolean last() throws SQLException {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    @Override
-    public int getRow() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
     @Override
@@ -941,12 +900,6 @@ public class ExcelResultSet implements ResultSet {
     public int getHoldability() throws SQLException {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    @Override
-    public boolean isClosed() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override
