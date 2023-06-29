@@ -120,7 +120,12 @@ public class ExcelParser {
     public int getRowCount( String sheetName ) {
         try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
             initSheetData( zipFile );
-            return readRowCount( zipFile, sheetName );
+            int rowCount = readRowCount( zipFile, sheetName );
+            if( hasHeaderRow ) {
+                // should not count header row
+                return Math.max( 0, rowCount - 1 );
+            }
+            return rowCount;
         } catch( IOException ex ) {
             throw new ExcelParserException( ex );
         }
@@ -149,6 +154,11 @@ public class ExcelParser {
         try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
             initSheetData( zipFile );
             initDimensionAndColumnNames( zipFile, sheetName );
+            if( hasHeaderRow ) {
+                // should skip header row
+                firstRowIndex++;
+                lastRowIndex++;
+            }
             return readRows( zipFile, sheetName, firstRowIndex, lastRowIndex );
         } catch( IOException ex ) {
             throw new ExcelParserException( ex );
@@ -251,13 +261,16 @@ public class ExcelParser {
         }
     }
 
-    /** Returns zip file entry for specified sheet or throws exception if such sheet does not exist inside Excel document.
+    /** Returns zip file entry for specified sheet or throws exception if it is null or such sheet does not exist inside Excel document.
      * @param zipFile component allowing access to data inside Excel document.
      * @param sheetName name of the sheet from Excel document.
      * @return zip file entry for specified sheet.
-     * @throws ExcelParserException if specified sheet does not exist inside Excel document.
+     * @throws ExcelParserException if specified sheet is null or does not exist inside Excel document.
      */
     private ZipEntry getZipEntryForSheet( ZipFile zipFile, String sheetName ) {
+        if( sheetName == null ) {
+            throw new ExcelParserException( new IllegalArgumentException( "Sheet name must not be null." ) ); //TODO rethink exception type
+        }
         ZipEntry sheetEntry = null;
         String sheetPath = sheetNamesToPaths.get( sheetName );
         if( sheetPath != null ) {

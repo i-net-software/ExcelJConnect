@@ -28,6 +28,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
@@ -64,21 +65,18 @@ public class ExcelParserTest {
 
     @Test
     public void getSheetNames_throws_exception_if_excel_file_does_not_exist() {
-        boolean hasHeaderRow = true; // irrelevant for this test
-        method_throws_exception_if_excel_file_does_not_exist( hasHeaderRow, ExcelParser::getSheetNames );
+        method_throws_exception_if_excel_file_does_not_exist( ExcelParser::getSheetNames );
     }
-
-    //TODO test: getColumnNames( null )
 
     @Test
     public void getColumnNames_throws_exception_if_excel_file_does_not_exist() {
-        method_throws_exception_if_excel_file_does_not_exist( true, parser -> parser.getColumnNames( "sheetName" ) );
-        method_throws_exception_if_excel_file_does_not_exist( false, parser -> parser.getColumnNames( "sheetName" ) );
+        method_throws_exception_if_excel_file_does_not_exist( parser -> parser.getColumnNames( "sheetName" ) );
     }
 
-    private void method_throws_exception_if_excel_file_does_not_exist( boolean hasHeaderRow, Consumer<ExcelParser> executable ) {
+    private void method_throws_exception_if_excel_file_does_not_exist( Consumer<ExcelParser> executable ) {
         Path path = Paths.get( "missing_file.xlsx" );
         assertFalse( Files.exists( path ) ); // precondition check
+        boolean hasHeaderRow = true; // irrelevant for this test
         ExcelParser parser = new ExcelParser( path, hasHeaderRow );
         try {
             executable.accept( parser );
@@ -89,22 +87,26 @@ public class ExcelParserTest {
     }
 
     @Test
-    public void getColumnNames_throws_exception_if_workbook_does_not_include_specified_sheet() {
-        getColumnNames_throws_exception_if_workbook_does_not_include_specified_sheet( true );
-        getColumnNames_throws_exception_if_workbook_does_not_include_specified_sheet( false );
+    public void getColumnNames_throws_exception_if_sheet_is_null() {
+        method_throws_exception_if_sheet_is_invalid( null, (parser,sheetName) -> parser.getColumnNames( sheetName ) );
     }
 
-    private void getColumnNames_throws_exception_if_workbook_does_not_include_specified_sheet( boolean hasHeaderRow ) {
-        String nonExistingSheetName = "nonExistingSheetName";
-        File resource = new File( ExcelParserTest.class.getResource( "./files/sheet_names.xlsx" ).getPath() );
+    private void method_throws_exception_if_sheet_is_invalid( String sheetName, BiConsumer<ExcelParser,String> executable ) {
+        File resource = new File( ExcelParserTest.class.getResource( "./files/rows.xlsx" ).getPath() );
+        boolean hasHeaderRow = true; // irrelevant for this test
         ExcelParser parser = new ExcelParser( resource.toPath(), hasHeaderRow );
-        assertFalse( parser.getSheetNames().contains( nonExistingSheetName ) ); // precondition check
+        assertFalse( parser.getSheetNames().contains( sheetName ) ); // precondition check
         try {
-            parser.getColumnNames( nonExistingSheetName );
+            executable.accept( parser, sheetName );
             fail( "expected exception" );
         } catch( ExcelParserException ex ) {
             assertEquals( IllegalArgumentException.class, ex.getCause().getClass() ); //TODO rethink type of exception
         }
+    }
+
+    @Test
+    public void getColumnNames_throws_exception_if_workbook_does_not_include_specified_sheet() {
+        method_throws_exception_if_sheet_is_invalid( "nonExistingSheetName", (parser,sheetName) -> parser.getColumnNames( sheetName ) );
     }
 
     @Test
@@ -175,7 +177,7 @@ public class ExcelParserTest {
     }
 
     @Test
-    public void getRows_returns_data_from_specified_rows() {
+    public void getRows_returns_data_from_specified_rows_of_document_without_header_row() {
         List<String> emptyRow = asList( "", "", "", "", "" );
 
         List<String> row1 = asList( "Red", "Black", "Green", "Yellow", "Blue" );
@@ -189,8 +191,7 @@ public class ExcelParserTest {
 
         String sheetName = "Sheet1";
         File resource = new File( ExcelParserTest.class.getResource( "./files/rows.xlsx" ).getPath() );
-        boolean hasHeaderRow = true; // irrelevant for this test
-        ExcelParser parser = new ExcelParser( resource.toPath(), hasHeaderRow );
+        ExcelParser parser = new ExcelParser( resource.toPath(), false );
 
         assertEquals( asList( row1, row2, row3, row4, row5, row6, row7, row8 ), parser.getRows( sheetName, 1, 8 ) );
 
@@ -199,6 +200,32 @@ public class ExcelParserTest {
         assertEquals( asList( row4, row5, row6 ), parser.getRows( sheetName, 4, 6 ) );
 
         assertEquals( asList( row8, emptyRow ), parser.getRows( sheetName, 8, 9 ) );
+        assertEquals( asList( emptyRow, emptyRow, emptyRow ), parser.getRows( sheetName, 55, 57 ) );
+    }
+
+    @Test
+    public void getRows_returns_data_from_specified_rows_of_document_with_header_row() {
+        List<String> emptyRow = asList( "", "", "", "", "" );
+
+        List<String> row1 = asList( "Cat", "", "Dog", "Bird", "" );
+        List<String> row2 = asList( "", "Flower", "Garden", "Tree", "Soil" );
+        List<String> row3 = emptyRow;
+        List<String> row4 = asList( "Fire", "", "Ice", "", "Water" );
+        List<String> row5 = asList( "Sun", "", "", "", "" );
+        List<String> row6 = asList( "", "", "", "", "Moon" );
+        List<String> row7 = asList( "One", "Two", "Three", "Four", "Five" );
+
+        String sheetName = "Sheet1";
+        File resource = new File( ExcelParserTest.class.getResource( "./files/rows.xlsx" ).getPath() );
+        ExcelParser parser = new ExcelParser( resource.toPath(), true );
+
+        assertEquals( asList( row1, row2, row3, row4, row5, row6, row7 ), parser.getRows( sheetName, 1, 7 ) );
+
+        assertEquals( asList( row1 ), parser.getRows( sheetName, 1, 1 ) );
+        assertEquals( asList( row3 ), parser.getRows( sheetName, 3, 3 ) );
+        assertEquals( asList( row4, row5, row6 ), parser.getRows( sheetName, 4, 6 ) );
+
+        assertEquals( asList( row7, emptyRow ), parser.getRows( sheetName, 7, 8 ) );
         assertEquals( asList( emptyRow, emptyRow, emptyRow ), parser.getRows( sheetName, 55, 57 ) );
     }
 
@@ -219,45 +246,48 @@ public class ExcelParserTest {
         assertThrows( IllegalArgumentException.class, () -> parser.getRows( sheetName, firstRowIndex, lastRowIndex ) );
     }
 
-    //TODO test: getRows( null, 1, 2 )
-
     @Test
     public void getRows_throws_exception_if_excel_file_does_not_exist() {
-        method_throws_exception_if_excel_file_does_not_exist( true, parser -> parser.getRows( "sheetName", 1, 2 ) );
-        method_throws_exception_if_excel_file_does_not_exist( false, parser -> parser.getRows( "sheetName", 1, 2 ) );
+        method_throws_exception_if_excel_file_does_not_exist( parser -> parser.getRows( "sheetName", 1, 2 ) );
+    }
+
+    @Test
+    public void getRows_throws_exception_if_sheet_is_null() {
+        method_throws_exception_if_sheet_is_invalid( null, (parser,sheetName) -> parser.getRows( sheetName, 1, 2 ) );
     }
 
     @Test
     public void getRows_throws_exception_if_workbook_does_not_include_specified_sheet() {
-        String nonExistingSheetName = "nonExistingSheetName";
-        File resource = new File( ExcelParserTest.class.getResource( "./files/rows.xlsx" ).getPath() );
-        boolean hasHeaderRow = true; // irrelevant for this test
-        ExcelParser parser = new ExcelParser( resource.toPath(), hasHeaderRow );
-        assertFalse( parser.getSheetNames().contains( nonExistingSheetName ) ); // precondition check
-        try {
-            parser.getRows( nonExistingSheetName, 1, 2 );
-            fail( "expected exception" );
-        } catch( ExcelParserException ex ) {
-            assertEquals( IllegalArgumentException.class, ex.getCause().getClass() ); //TODO rethink type of exception
-        }
+        method_throws_exception_if_sheet_is_invalid( "nonExistingSheetName", (parser,sheetName) -> parser.getRows( sheetName, 1, 2 ) );
     }
 
     @Test
     public void getRowCount_returns_number_of_rows_included_in_specified_sheet() {
         File resource = new File( ExcelParserTest.class.getResource( "./files/row_count.xlsx" ).getPath() );
-        boolean hasHeaderRow = true; // irrelevant for this test
-        ExcelParser parser = new ExcelParser( resource.toPath(), hasHeaderRow );
 
+        ExcelParser parser = new ExcelParser( resource.toPath(), false );
         assertEquals( 3, parser.getRowCount( "Sheet1" ) );
         assertEquals( 17, parser.getRowCount( "Sheet2" ) );
         assertEquals( 0, parser.getRowCount( "Sheet3" ) );
-    }
 
-    //TODO test: getRowCount( null )
+        parser = new ExcelParser( resource.toPath(), true );
+        assertEquals( 2, parser.getRowCount( "Sheet1" ) );
+        assertEquals( 16, parser.getRowCount( "Sheet2" ) );
+        assertEquals( 0, parser.getRowCount( "Sheet3" ) );
+    }
 
     @Test
     public void getRowCount_throws_exception_if_excel_file_does_not_exist() {
-        method_throws_exception_if_excel_file_does_not_exist( true, parser -> parser.getRowCount( "sheetName" ) );
-        method_throws_exception_if_excel_file_does_not_exist( false, parser -> parser.getRowCount( "sheetName" ) );
+        method_throws_exception_if_excel_file_does_not_exist( parser -> parser.getRowCount( "sheetName" ) );
+    }
+
+    @Test
+    public void getRowCount_throws_exception_if_sheet_is_null() {
+        method_throws_exception_if_sheet_is_invalid( null, (parser,sheetName) -> parser.getRowCount( sheetName ) );
+    }
+
+    @Test
+    public void getRowCount_throws_exception_if_workbook_does_not_include_specified_sheet() {
+        method_throws_exception_if_sheet_is_invalid( "nonExistingSheetName", (parser,sheetName) -> parser.getRowCount( sheetName ) );
     }
 }

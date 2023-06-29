@@ -21,6 +21,8 @@ import java.util.List;
 
 import com.inet.excel.parser.ExcelParser;
 
+/** Class for result set used to retrieve data of the sheet from Excel document.
+ */
 public class ExcelSheetResultSet extends ExcelResultSet {
 
     private final ExcelParser parser;
@@ -34,7 +36,12 @@ public class ExcelSheetResultSet extends ExcelResultSet {
     private int currentBatchIndex;
     private boolean closed;
 
-    public ExcelSheetResultSet( ExcelParser parser, String sheetName, int maxRowsPerBatch ) {
+    /** Constructor of the class.
+     * @param parser component responsible for reading data from Excel document.
+     * @param sheetName name of the sheet from Excel document.
+     * @param maxRowsPerBatch maximum number of rows read at one time.
+     */
+    public ExcelSheetResultSet( ExcelParser parser, String sheetName, int maxRowsPerBatch ) { //TODO validate input
         super( parser.getColumnNames( sheetName ) );
         this.parser = parser;
         this.sheetName = sheetName;
@@ -121,6 +128,7 @@ public class ExcelSheetResultSet extends ExcelResultSet {
     @Override
     protected <T> T getValue( int columnIndex ) throws SQLException {
         throwIfAlreadyClosedOrReachedEnd();
+        throwIfColumnIndexIsInvalid( columnIndex );
         return (T)rowBatch.get( currentBatchIndex ).get( columnIndex - 1 );
     }
 }

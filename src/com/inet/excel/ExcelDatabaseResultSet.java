@@ -96,6 +96,7 @@ public class ExcelDatabaseResultSet extends ExcelResultSet {
     @Override
     protected <T> T getValue( int columnIndex ) throws SQLException {
         throwIfAlreadyClosedOrReachedEnd();
+        throwIfColumnIndexIsInvalid( columnIndex );
         return (T)rows.get( currentRowIndex ).get( columnIndex - 1 );
     }
 }

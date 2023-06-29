@@ -39,29 +39,63 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/** Base class for result sets used within Excel Driver project.
+ */
 public abstract class ExcelResultSet implements ResultSet {
 
     private final List<String> columnNames;
 
+    /** Constructor of the class.
+     * @param columnNames list of column names.
+     * @throws IllegalArgumentException if given list is null.
+     */
     public ExcelResultSet( List<String> columnNames ) {
+        if( columnNames == null ) {
+            throw new IllegalArgumentException( "list of column names must not be null" );
+        }
         this.columnNames = Collections.unmodifiableList( columnNames );
     }
 
+    /** Retrieves the value of the designated column in the current row of this ResultSet object.
+     * @param <T> type of the returned value.
+     * @param columnIndex the first column is 1, the second is 2, ...
+     * @return the column value.
+     * @throws SQLException if the columnIndex is not valid; if a database access error occurs or this method is called on a closed result set.
+     */
     abstract protected <T> T getValue( int columnIndex ) throws SQLException;
 
+    /** Throws exception if result set is already closed.
+     * @throws SQLException if result set is already closed.
+     */
     protected void throwIfAlreadyClosed() throws SQLException {
         if( isClosed() ) {
             throw new SQLException( "ResultSet: already closed" );
         }
     }
 
+    /** Throws exception if result set is closed or its cursor is after the last row.
+     * @throws SQLException if result set is closed or its cursor is after the last row.
+     */
     protected void throwIfAlreadyClosedOrReachedEnd() throws SQLException {
         throwIfAlreadyClosed();
         if( isAfterLast() ) {
             throw new SQLException( "ResultSet: already reached end" );
         }
     }
+    
+    /** Throws exception if the columnIndex is not valid.
+     * @param columnIndex the first column is 1, the second is 2, ...
+     * @throws SQLException if the columnIndex is not valid.
+     */
+    protected void throwIfColumnIndexIsInvalid( int columnIndex ) throws SQLException {
+        if( columnIndex < 1 || columnIndex > columnNames.size() ) {
+            throw new SQLException( "ResultSet: invalid column index " + columnIndex + " for column count " + columnNames.size() );
+        }
+    }
 
+    /** Returns list of column names.
+     * @return list of column names.
+     */
     protected List<String> getColumnNames() {
         return columnNames;
     }
@@ -292,6 +326,9 @@ public abstract class ExcelResultSet implements ResultSet {
         return getValue( columnIndex );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int findColumn( String columnLabel ) throws SQLException {
         throwIfAlreadyClosed();
@@ -300,7 +337,7 @@ public abstract class ExcelResultSet implements ResultSet {
                 return index + 1;
             }
         }
-        throw new SQLException(); //TODO
+        throw new SQLException( "ResultSet: unknown column \"" + columnLabel + "" );
     }
 
     @Override

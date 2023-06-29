@@ -17,9 +17,13 @@ package com.inet.excel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -27,26 +31,71 @@ import org.junit.jupiter.api.Test;
 class ExcelDriverTest {
 
     @Test
-    void acceptsURL_throws_exception_if_url_is_null() {
+    public void connect_throws_exception_if_url_is_null() {
+        ExcelDriver driver = newDriver();
+        assertThrows( SQLException.class, () -> driver.connect( null, new Properties() ) );
+    }
+
+    @Test
+    public void connect_returns_null_if_url_does_not_start_with_expected_prefix() throws SQLException {
+        for( String url : getURLsWhichDoNotStartWithExpectedPrefix() ) {
+            assertNull( newDriver().connect( url, new Properties() ), url );
+        }
+    }
+
+    @Test
+    public void connect_throws_exception_if_path_to_excel_file_is_not_specified_in_url() {
+        List<String> missingFilePathURLs = Arrays.asList( ExcelDriver.URL_PREFIX, //
+                                                          ExcelDriver.URL_PREFIX + "     ", //
+                                                          ExcelDriver.URL_PREFIX + "?", //
+                                                          ExcelDriver.URL_PREFIX + "?hasHeaderRow=false", //
+                                                          ExcelDriver.URL_PREFIX + "    ?", //
+                                                          ExcelDriver.URL_PREFIX + "    ?hasHeaderRow=false" );
+
+        for( String url : missingFilePathURLs ) {
+            ExcelDriver driver = newDriver();
+            assertThrows( SQLException.class, () -> driver.connect( url, new Properties() ), url );
+        }
+    }
+
+    @Test
+    public void connect_throws_exception_if_path_to_excel_file_does_not_represent_existing_file() throws IOException {
+        ExcelDriver driver = newDriver();
+
+        Path folder = Files.createTempDirectory( "ExcelDriverTest_" + UUID.randomUUID() );
+        assertTrue( Files.isDirectory( folder ) ); // precondition check
+        String urlWithPathToExistingFolder = ExcelDriver.URL_PREFIX + folder.toAbsolutePath().toString();
+        assertThrows( SQLException.class, () -> driver.connect( urlWithPathToExistingFolder, new Properties() ) );
+
+        Path nonExistingFile = folder.getParent().resolve( "nonExistingFile.xlsx" );
+        assertFalse( Files.exists( nonExistingFile ) ); // precondition check
+        String urlWithPathToNonExistingFile = ExcelDriver.URL_PREFIX + nonExistingFile.toAbsolutePath().toString();
+        assertThrows( SQLException.class, () -> driver.connect( urlWithPathToNonExistingFile, new Properties() ) );
+    }
+
+    @Test
+    public void connect_returns_connection_to_specified_existing_file() throws IOException, SQLException {
+        Path file = Files.createTempFile(  "ExcelDriverTest_" + UUID.randomUUID(), ".xlsx" );
+        assertTrue( Files.isRegularFile( file ) ); // precondition check
+        String urlWithPathToExistingFile = ExcelDriver.URL_PREFIX + file.toAbsolutePath().toString();
+        assertNotNull( newDriver().connect( urlWithPathToExistingFile, new Properties() ) );
+    }
+
+    @Test
+    public void acceptsURL_throws_exception_if_url_is_null() {
         ExcelDriver driver = newDriver();
         assertThrows( SQLException.class, () -> driver.acceptsURL( null ) );
     }
 
     @Test
-    void acceptsURL_returns_false_if_url_does_not_start_with_expected_prefix() throws SQLException {
-        List<String> invalidURLs = Arrays.asList( "", //
-                                                  " ", //
-                                                  "   ", //
-                                                  " " + ExcelDriver.URL_PREFIX, //
-                                                  UUID.randomUUID().toString() + ExcelDriver.URL_PREFIX );
-
-        for( String url : invalidURLs ) {
+    public void acceptsURL_returns_false_if_url_does_not_start_with_expected_prefix() throws SQLException {
+        for( String url : getURLsWhichDoNotStartWithExpectedPrefix() ) {
             assertFalse( newDriver().acceptsURL( url ), url );
         }
     }
 
     @Test
-    void acceptsURL_returns_true_if_url_starts_with_expected_prefix() throws SQLException {
+    public void acceptsURL_returns_true_if_url_starts_with_expected_prefix() throws SQLException {
         // method "acceptsURL" checks whether sub protocol matches - it does not validate whole URL
         List<String> validURLs = Arrays.asList( ExcelDriver.URL_PREFIX, //
                                                 ExcelDriver.URL_PREFIX + UUID.randomUUID().toString() );
@@ -73,5 +122,13 @@ class ExcelDriverTest {
 
     private ExcelDriver newDriver() {
         return new ExcelDriver();
+    }
+
+    private List<String> getURLsWhichDoNotStartWithExpectedPrefix() {
+        return Arrays.asList( "", //
+                              " ", //
+                              "   ", //
+                              " " + ExcelDriver.URL_PREFIX, //
+                              UUID.randomUUID().toString() + ExcelDriver.URL_PREFIX );
     }
 }

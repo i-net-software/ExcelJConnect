@@ -15,6 +15,8 @@
  */
 package com.inet.excel;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -30,13 +32,54 @@ public class ExcelDriver implements Driver {
 
     public static final String URL_PREFIX = "jdbc:inetexcel:";
 
+    static void throwExceptionAboutUnsupportedOperation() throws SQLException {
+        throw new SQLException( "Unsupported operation" );
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Connection connect( String url, Properties info ) throws SQLException {
-        // TODO check whether url is accepted
-        ExcelParser parser = new ExcelParser( Paths.get( "D:\\excel_driver_tests\\test.xlsx" ), true ); //TODO
+        if( !acceptsURL( url ) ) {
+            return null;
+        }
+
+        url = url.substring( URL_PREFIX.length() );
+
+        int questionMarkIndex = url.indexOf( '?' );
+        if( questionMarkIndex == 0 ) {
+            throw new SQLException( "Excel file is not specified" );
+        }
+
+        String filePath = null;
+        boolean hasHeaderRow = true;
+
+        if( questionMarkIndex == -1 ) {
+            filePath = url;
+        } else {
+            filePath = url.substring( 0, questionMarkIndex );
+            String propertiesPart = url.substring( questionMarkIndex + 1 );
+            String[] properties = propertiesPart.split( "&" );
+
+            for( String property : properties ) {
+                if( "hasHeaderRow=false".equalsIgnoreCase( property ) ) {
+                    hasHeaderRow = false;
+                    break;
+                }
+            }
+        }
+
+        if( filePath.trim().isEmpty() ) {
+            throw new SQLException( "Excel file is not specified" );
+        }
+
+        Path file = Paths.get( filePath ).toAbsolutePath();
+        if( !Files.isRegularFile( file ) ) {
+            throw new SQLException( "Specified Excel file does not exist" );
+        }
+
+        ExcelParser parser = new ExcelParser( file, hasHeaderRow );
         return new ExcelConnection( parser );
     }
 
