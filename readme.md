@@ -5,10 +5,10 @@ A Excel driver (*.xlsx) written completely in Java (pure Java).
 ## Usage ##
 
 ```java
-Connection conn = DriverManager.getConnection( "jdbc:inetexcel:{xlsx file}?hasHeaderRow=true" );
+Connection conn = DriverManager.getConnection( "jdbc:inetexcel:{xlsx file}?hasHeaderRow=false" );
 DatabaseMetaData metaData = conn.getMetaData();
 ResultSet sheets = metaData.getProcedures( null, null, null );
-while( rs.next() ) {
-    System.out.println( "Sheet: " + rs.getString( "PROCEDURE_NAME" ) );
+while( sheets.next() ) {
+    System.out.println( "Sheet: " + sheets.getString( "PROCEDURE_NAME" ) );
 }
 ```
