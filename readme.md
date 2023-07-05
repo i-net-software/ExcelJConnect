@@ -2,7 +2,7 @@
 
 A Excel driver (*.xlsx) written completely in Java (pure Java).
 
-** Usage **
+## Usage ##
 
 ```java
 Connection conn = DriverManager.getConnection( "jdbc:inetexcel:{xlsx file}?hasHeaderRow=true" );
