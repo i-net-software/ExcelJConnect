@@ -28,10 +28,15 @@ import java.util.logging.Logger;
 
 import com.inet.excel.parser.ExcelParser;
 
+/** Implementation of JDBC Driver, which allows to read data from Excel documents.
+ */
 public class ExcelDriver implements Driver {
 
     public static final String URL_PREFIX = "jdbc:inetexcel:";
 
+    /** Throws exception indicating that requested operation is not supported.
+     * @throws SQLException exception indicating that requested operation is not supported.
+     */
     static void throwExceptionAboutUnsupportedOperation() throws SQLException {
         throw new SQLException( "Unsupported operation" );
     }
@@ -132,7 +137,6 @@ public class ExcelDriver implements Driver {
      */
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new SQLFeatureNotSupportedException();
     }
 }

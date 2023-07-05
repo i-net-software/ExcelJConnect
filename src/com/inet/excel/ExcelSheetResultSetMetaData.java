@@ -29,18 +29,27 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
         this.columnNames = columnNames;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T unwrap( Class<T> iface ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isWrapperFor( Class<?> iface ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getColumnCount() throws SQLException {
         return columnNames.size();
@@ -69,11 +78,17 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int isNullable( int column ) throws SQLException {
         return columnNoNulls;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isSigned( int column ) throws SQLException {
         return false;

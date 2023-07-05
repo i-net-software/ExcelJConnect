@@ -99,4 +99,10 @@ public class ExcelDatabaseResultSet extends ExcelResultSet {
         throwIfColumnIndexIsInvalid( columnIndex );
         return (T)rows.get( currentRowIndex ).get( columnIndex - 1 );
     }
+
+    @Override
+    public boolean wasNull() throws SQLException {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

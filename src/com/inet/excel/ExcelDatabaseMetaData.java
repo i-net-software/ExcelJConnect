@@ -39,12 +39,18 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         this.parser = parser;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getTables( String catalog, String schemaPattern, String tableNamePattern, String[] types ) throws SQLException {
         List<String> columnNames = Arrays.asList( "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "TABLE_TYPE", "REMARKS", "TYPE_CAT", "TYPE_SCHEM", "TYPE_NAME", "SELF_REFERENCING_COL_NAME", "REF_GENERATION" );
         return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getColumns( String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern ) throws SQLException {
         List<String> columnNames = Arrays.asList( "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME", "DATA_TYPE", "TYPE_NAME", "COLUMN_SIZE", "BUFFER_LENGTH", //
@@ -54,21 +60,29 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDatabaseProductName() throws SQLException {
-        // TODO Auto-generated method stub
         return PRODUCT_NAME;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T unwrap( Class<T> iface ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isWrapperFor( Class<?> iface ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 

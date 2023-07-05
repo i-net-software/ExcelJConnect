@@ -39,9 +39,11 @@ import com.inet.excel.parser.ExcelParser;
 public class ExcelConnection implements Connection {
 
     private final ExcelParser parser;
+    private boolean closed;
 
     public ExcelConnection( ExcelParser parser ) {
         this.parser = parser;
+        this.closed = false;
     }
 
     /**
@@ -49,37 +51,52 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        // TODO Auto-generated method stub
         return new ExcelDatabaseMetaData( parser );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T unwrap( Class<T> iface ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isWrapperFor( Class<?> iface ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Statement createStatement() throws SQLException {
-        // TODO Auto-generated method stub
-        return new ExcelStatement();
-    }
-
-    @Override
-    public PreparedStatement prepareStatement( String sql ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PreparedStatement prepareStatement( String sql ) throws SQLException {
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CallableStatement prepareCall( String sql ) throws SQLException {
-        // TODO Auto-generated method stub
+        throwIfAlreadyClosed();
+
         String procedureName = null;
 
         if( sql != null && sql.startsWith( "{call " ) ) {
@@ -96,9 +113,12 @@ public class ExcelConnection implements Connection {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String nativeSQL( String sql ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -126,16 +146,20 @@ public class ExcelConnection implements Connection {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws SQLException {
-        // TODO Auto-generated method stub
-
+        closed = true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isClosed() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return closed;
     }
 
     @Override
@@ -383,5 +407,13 @@ public class ExcelConnection implements Connection {
         // TODO Auto-generated method stub
         return 0;
     }
-
+    
+    /** Throws exception if connection is already closed.
+     * @throws SQLException if connection is already closed.
+     */
+    private void throwIfAlreadyClosed() throws SQLException {
+        if( isClosed() ) {
+            throw new SQLException( "Connection: already closed" );
+        }
+    }
 }

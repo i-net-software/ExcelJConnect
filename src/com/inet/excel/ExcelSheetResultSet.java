@@ -90,6 +90,7 @@ public class ExcelSheetResultSet extends ExcelResultSet {
      */
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
+        throwIfAlreadyClosed();
         return metaData;
     }
 
@@ -130,5 +131,14 @@ public class ExcelSheetResultSet extends ExcelResultSet {
         throwIfAlreadyClosedOrReachedEnd();
         throwIfColumnIndexIsInvalid( columnIndex );
         return (T)rowBatch.get( currentBatchIndex ).get( columnIndex - 1 );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean wasNull() throws SQLException {
+        throwIfAlreadyClosed();
+        return false;
     }
 }

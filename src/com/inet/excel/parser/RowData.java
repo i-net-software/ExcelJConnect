@@ -57,37 +57,63 @@ public class RowData {
         return cellsInRow;
     }
 
+    /** Container for data of single cell.
+     */
     public static class CellData {
         private String r, s, t, v;
 
+        /** Returns reference to the location of this cell. For example "A1".
+         * @return reference to the location of this cell.
+         */
         public String getR() {
             return r;
         }
 
+        /** Sets reference to the location of this cell.
+         * @param r reference to the location of this cell. For example "A1".
+         */
         public void setR( String r ) {
             this.r = r;
         }
 
+        /** Returns index of this cell's style. For example "1".
+         * @return index of this cell's style.
+         */
         public String getS() {
             return s;
         }
 
+        /** Sets index of this cell's style.
+         * @param s index of this cell's style. For example "1".
+         */
         public void setS( String s ) {
             this.s = s;
         }
 
+        /** Returns enumeration representing this cell's data type. For example "s" for shared string.
+         * @return enumeration representing this cell's data type.
+         */
         public String getT() {
             return t;
         }
 
+        /** Sets enumeration representing this cell's data type.
+         * @param t enumeration representing this cell's data type. For example "s" for shared string.
+         */
         public void setT( String t ) {
             this.t = t;
         }
 
+        /** Returns this cell's value.
+         * @return this cell's value.
+         */
         public String getV() {
             return v;
         }
 
+        /** Sets this cell's value.
+         * @param v this cell's value.
+         */
         public void setV( String v ) {
             this.v = v;
         }
