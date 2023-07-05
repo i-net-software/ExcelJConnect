@@ -1,0 +1,58 @@
+plugins {
+  id 'maven-publish'
+}
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['src']
+            exclude '**/*.java'
+        }
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier = 'sources'
+
+    from sourceSets.main.java
+}
+
+jar {
+    dependsOn sourcesJar
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'de.inetsoftware'
+            artifactId = 'exceljconnect'
+            version = '1.0'
+            from components.java
+            pom {
+                name = 'Excel driver for Java'
+                description = 'A Excel driver (*.xlsx) written completely in Java (pure Java).'
+                url = 'https://github.com/i-net-software/ExcelJConnect'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git@github.com:i-net-software/ExcelJConnect.git'
+                    developerConnection = 'scm:git:git@github.com:i-net-software/ExcelJConnect.git'
+                    url = 'https://github.com/i-net-software/ExcelJConnect'
+                }
+            } 
+        }
+    }
+}
