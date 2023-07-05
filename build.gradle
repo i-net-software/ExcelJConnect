@@ -18,6 +18,15 @@ sourceSets {
             exclude '**/*.java'
         }
     }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+        resources {
+            srcDirs = ['test']
+            exclude '**/*.java'
+        }
+    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
