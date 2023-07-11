@@ -24,6 +24,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import com.inet.excel.parser.ExcelParser;
 
@@ -825,10 +826,12 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
                                                   "ORDINAL_POSITION", "IS_NULLABLE", "SPECIFIC_NAME" );
         List<List<Object>> allRows = new ArrayList<>();
 
-        //TODO return only data of columns matched by specified patterns
-
         try {
             for( String sheetName : parser.getSheetNames() ) {
+                if( procedureNamePattern != null && !Objects.equals( sheetName, procedureNamePattern ) ) {
+                    continue;
+                }
+
                 int colIndex = 0;
                 for( String colName : parser.getColumnNames( sheetName ) ) {
                     colIndex++; // indexing starts with 1
