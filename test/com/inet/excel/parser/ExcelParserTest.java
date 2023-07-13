@@ -230,6 +230,28 @@ public class ExcelParserTest {
     }
 
     @Test
+    public void getRows_returns_data_of_various_types() {
+        File resource = new File( ExcelParserTest.class.getResource( "./files/various_data_types.xlsx" ).getPath() );
+        ExcelParser parser = new ExcelParser( resource.toPath(), false );
+
+        List<List<String>> expectedRows = asList( asList( "125" ), // $125.0000 
+                                                  asList( "222" ), // 222
+                                                  asList( "333" ), // 333.00
+                                                  asList( "444" ), // $444.00
+                                                  asList( "555" ), // $555.00 
+                                                  asList( "45220" ), // 10/21/2023
+                                                  asList( "47837" ), // Friday, December 20, 2030
+                                                  asList( "0.51388888888888895" ), // 12:20:00 PM
+                                                  asList( "1.1000000000000001" ), // 110.00%
+                                                  asList( "2.4" ), // 2 2/5
+                                                  asList( "10" ), // 1.00E+01
+                                                  asList( "#DIV/0!" ), // #DIV/0!
+                                                  asList( "555" ) ); // 555.00
+
+        assertEquals( expectedRows, parser.getRows( "Sheet1", 1, 13 ) );
+    }
+
+    @Test
     public void getRows_throws_exception_if_specified_column_indexes_are_invalid() {
         assertGetRowsThrowsException( 0, 1 );
         assertGetRowsThrowsException( 1, 0 );

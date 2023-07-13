@@ -532,7 +532,8 @@ public class ExcelParser {
                 return null;
             }
         } else {
-            return null;//TODO format cell value
+            // NOTE: place for possible future improvements: cell value formatting
+            return cell.getV();
         }
     }
 
