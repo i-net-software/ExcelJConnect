@@ -5,7 +5,7 @@ A Excel driver (*.xlsx) written completely in Java (pure Java).
 ## Usage ##
 
 ```java
-Connection conn = DriverManager.getConnection( "jdbc:inetexcel:D:\\excel_driver_tests\\column_names.xlsx?hasHeaderRow=false" );
+Connection conn = DriverManager.getConnection( "jdbc:inetexcel:{xlsx file}?hasHeaderRow=false" );
 DatabaseMetaData metaData = conn.getMetaData();
 
 // lists all available sheets
