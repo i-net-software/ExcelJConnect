@@ -269,7 +269,7 @@ public class ExcelParser {
      */
     private ZipEntry getZipEntryForSheet( ZipFile zipFile, String sheetName ) {
         if( sheetName == null ) {
-            throw new ExcelParserException( new IllegalArgumentException( "Sheet name must not be null." ) ); //TODO rethink exception type
+            throw new ExcelParserException( new IllegalArgumentException( "Sheet name must not be null." ) );
         }
         ZipEntry sheetEntry = null;
         String sheetPath = sheetNamesToPaths.get( sheetName );
@@ -278,7 +278,7 @@ public class ExcelParser {
         }
         if( sheetEntry == null ) {
             String msg = "There is no sheet with name \"" + sheetName + "\".";
-            throw new ExcelParserException( new IllegalArgumentException( msg ) ); //TODO rethink exception type
+            throw new ExcelParserException( new IllegalArgumentException( msg ) );
         }
         return sheetEntry;
     }

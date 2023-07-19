@@ -104,8 +104,7 @@ public class ExcelDriver implements Driver {
      */
     @Override
     public DriverPropertyInfo[] getPropertyInfo( String url, Properties info ) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return new DriverPropertyInfo[0];
     }
 
     /**

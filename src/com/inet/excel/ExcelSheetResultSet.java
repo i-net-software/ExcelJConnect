@@ -40,9 +40,13 @@ public class ExcelSheetResultSet extends ExcelResultSet {
      * @param parser component responsible for reading data from Excel document.
      * @param sheetName name of the sheet from Excel document.
      * @param maxRowsPerBatch maximum number of rows read at one time.
+     * @throws IllegalArgumentException if any of given arguments is null; if max number of rows per batch is not greater than zero.
      */
-    public ExcelSheetResultSet( ExcelParser parser, String sheetName, int maxRowsPerBatch ) { //TODO validate input
-        super( parser.getColumnNames( sheetName ) );
+    public ExcelSheetResultSet( ExcelParser parser, String sheetName, int maxRowsPerBatch ) {
+        super( getColumnNames( parser, sheetName ) );
+        if( maxRowsPerBatch <= 0 ) {
+            throw new IllegalArgumentException( "max number of rows per batch must be greater than zero" );
+        }
         this.parser = parser;
         this.sheetName = sheetName;
         this.maxRowsPerBatch = maxRowsPerBatch;
@@ -51,6 +55,22 @@ public class ExcelSheetResultSet extends ExcelResultSet {
         this.currentRowIndex = -1;
         this.currentBatchIndex = -1;
         this.closed = false;
+    }
+
+    /** Uses given parser to obtain list of column names from specified sheet, but at the very beginning, it performs null-checks.
+     * @param parser component responsible for reading data from Excel document.
+     * @param sheetName name of the sheet from Excel document.
+     * @return list of column names from specified sheet.
+     * @throws IllegalArgumentException if any of given arguments is null.
+     */
+    private static List<String> getColumnNames( ExcelParser parser, String sheetName ) {
+        if( parser == null ) {
+            throw new IllegalArgumentException( "parser must not be null" );
+        }
+        if( sheetName == null ) {
+            throw new IllegalArgumentException( "sheet name must not be null" );
+        }
+        return parser.getColumnNames( sheetName );
     }
 
     /**

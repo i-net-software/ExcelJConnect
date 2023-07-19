@@ -82,7 +82,7 @@ public class ExcelParserTest {
             executable.accept( parser );
             fail( "expected exception" );
         } catch( ExcelParserException ex ) {
-            assertEquals( NoSuchFileException.class, ex.getCause().getClass() ); //TODO rethink type of exception
+            assertEquals( NoSuchFileException.class, ex.getCause().getClass() );
         }
     }
 
@@ -100,7 +100,7 @@ public class ExcelParserTest {
             executable.accept( parser, sheetName );
             fail( "expected exception" );
         } catch( ExcelParserException ex ) {
-            assertEquals( IllegalArgumentException.class, ex.getCause().getClass() ); //TODO rethink type of exception
+            assertEquals( IllegalArgumentException.class, ex.getCause().getClass() );
         }
     }
 

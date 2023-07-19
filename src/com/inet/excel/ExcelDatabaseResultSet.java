@@ -19,15 +19,30 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
+/** Class for result set used to provide information about available procedures and procedure columns.
+ */
 public class ExcelDatabaseResultSet extends ExcelResultSet {
 
     private List<List<Object>> rows;
     private int currentRowIndex;
+    private boolean wasNull;
 
+    /** Constructor of the class.
+     * @param columnNames list of column names.
+     * @param rows list of rows with data corresponding to specified columns.
+     * @throws IllegalArgumentException if any of given lists is null; if number of values in all rows does not match number of columns.
+     */
     public ExcelDatabaseResultSet( List<String> columnNames, List<List<Object>> rows ) {
         super( columnNames );
+        if( rows == null ) {
+            throw new IllegalArgumentException( "list of rows must not be null" );
+        }
+        if( rows.stream().anyMatch( row -> row.size() != columnNames.size() ) ) {
+            throw new IllegalArgumentException( "number of values in all rows must match number of columns" );
+        }
         this.rows = rows;
         this.currentRowIndex = -1;
+        this.wasNull = false;
     }
 
     /**
@@ -57,7 +72,7 @@ public class ExcelDatabaseResultSet extends ExcelResultSet {
      */
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -97,12 +112,17 @@ public class ExcelDatabaseResultSet extends ExcelResultSet {
     protected <T> T getValue( int columnIndex ) throws SQLException {
         throwIfAlreadyClosedOrReachedEnd();
         throwIfColumnIndexIsInvalid( columnIndex );
-        return (T)rows.get( currentRowIndex ).get( columnIndex - 1 );
+        T value = (T)rows.get( currentRowIndex ).get( columnIndex - 1 );
+        wasNull = value == null;
+        return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean wasNull() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        throwIfAlreadyClosed();
+        return wasNull;
     }
 }

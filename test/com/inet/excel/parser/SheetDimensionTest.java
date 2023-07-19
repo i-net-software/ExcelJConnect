@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 public class SheetDimensionTest {
 
     @Test
-    public void constructor_doethrows_exception_if_specified_column_indexes_are_invalid() {
+    public void constructor_creates_instance_if_specified_column_indexes_are_valid() {
         assertConstructorCreatesInstance( 1, 1 );
         assertConstructorCreatesInstance( 1, 2 );
         assertConstructorCreatesInstance( 2, 2 );

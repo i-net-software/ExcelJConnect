@@ -41,20 +41,56 @@ import java.util.Map;
 
 import com.inet.excel.parser.ExcelParser;
 
+/** Class for statement whose sole purpose is to provide result set with data of the sheet from Excel document.
+ */
 public class ExcelCallableStatement implements CallableStatement {
 
     private final ExcelParser parser;
     private final String sheetName;
+    private boolean closed;
 
+    /** Constructor of the class.
+     * @param parser component responsible for reading data from Excel document.
+     * @param sheetName name of the sheet from Excel document.
+     * @throws IllegalArgumentException if any of given arguments is null.
+     */
     public ExcelCallableStatement( ExcelParser parser, String sheetName ) {
+        if( parser == null ) {
+            throw new IllegalArgumentException( "parser must not be null" );
+        }
+        if( sheetName == null ) {
+            throw new IllegalArgumentException( "sheet name must not be null" );
+        }
         this.parser = parser;
         this.sheetName = sheetName;
+        this.closed = false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet executeQuery() throws SQLException {
-        // TODO Auto-generated method stub
+        throwIfAlreadyClosed();
         return new ExcelSheetResultSet( parser, sheetName, 50 );
+    }
+
+    /** Throws exception if statement is already closed.
+     * @throws SQLException if statement is already closed.
+     */
+    private void throwIfAlreadyClosed() throws SQLException {
+        if( isClosed() ) {
+            throw new SQLException( "Statement: already closed" );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResultSetMetaData getMetaData() throws SQLException {
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
+        return null;
     }
 
     /**
@@ -283,12 +319,6 @@ public class ExcelCallableStatement implements CallableStatement {
         ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
-    @Override
-    public ResultSetMetaData getMetaData() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -508,10 +538,12 @@ public class ExcelCallableStatement implements CallableStatement {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws SQLException {
-        // TODO Auto-generated method stub
-
+        closed = true;
     }
 
     /**
@@ -556,9 +588,12 @@ public class ExcelCallableStatement implements CallableStatement {
         ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getQueryTimeout() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
@@ -804,10 +839,12 @@ public class ExcelCallableStatement implements CallableStatement {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isClosed() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return closed;
     }
 
     /**
