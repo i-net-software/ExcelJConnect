@@ -17,6 +17,7 @@ sourceSets {
     main {
         java {
             srcDirs = ['src']
+            include '**/*.java'
         }
         resources {
             srcDirs = ['src']
@@ -26,6 +27,7 @@ sourceSets {
     test {
         java {
             srcDirs = ['test']
+            include '**/*.java'
         }
         resources {
             srcDirs = ['test']
