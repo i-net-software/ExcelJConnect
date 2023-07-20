@@ -1,5 +1,6 @@
 plugins {
   id 'maven-publish'
+  id 'signing'
 }
 
 apply plugin: 'java'
@@ -33,14 +34,9 @@ sourceSets {
     }
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = 'sources'
-
-    from sourceSets.main.java
-}
-
-jar {
-    dependsOn sourcesJar
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 publishing {
@@ -68,4 +64,19 @@ publishing {
             } 
         }
     }
+
+    repositories {
+        maven {
+            name = 'sonatype'
+            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = project.findProperty("ossrhUsername")
+                password = project.findProperty("ossrhPassword")
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.maven
 }

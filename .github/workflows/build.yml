@@ -15,3 +15,8 @@ jobs:
         distribution: 'temurin'
     - name: Build with Gradle
       run: gradle build --stacktrace
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: '**/test-results/**/*.xml'
