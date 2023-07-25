@@ -16,6 +16,7 @@
 package com.inet.excel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -33,6 +34,11 @@ import com.inet.excel.parser.ExcelParser;
 import com.inet.excel.parser.ExcelParserTest;
 
 public class ExcelDatabaseMetaDataTest {
+
+    @Test
+    public void constructor_throws_exception_if_parser_is_null() {
+        assertThrows( IllegalArgumentException.class, () -> new ExcelDatabaseMetaData( null ) );
+    }
 
     @Test
     public void getProcedures_returns_information_about_procedures_representing_all_sheets_from_excel_document() throws SQLException {

@@ -50,7 +50,7 @@ public class ExcelSheetResultSet extends ExcelResultSet {
         this.parser = parser;
         this.sheetName = sheetName;
         this.maxRowsPerBatch = maxRowsPerBatch;
-        this.metaData = new ExcelSheetResultSetMetaData( getColumnNames() );
+        this.metaData = new ExcelSheetResultSetMetaData( parser.getFileName(), sheetName, getColumnNames() );
         this.rowCount = parser.getRowCount( sheetName );
         this.currentRowIndex = -1;
         this.currentBatchIndex = -1;

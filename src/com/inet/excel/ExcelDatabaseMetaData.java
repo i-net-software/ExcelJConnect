@@ -18,6 +18,7 @@ package com.inet.excel;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -28,6 +29,8 @@ import java.util.Objects;
 
 import com.inet.excel.parser.ExcelParser;
 
+/** Implementation of {@link ResultSetMetaData} for {@link ExcelConnection}
+ */
 public class ExcelDatabaseMetaData implements DatabaseMetaData {
 
     public static final int VARCHAR_COLUMN_SIZE_IN_BYTES = 65535;
@@ -36,7 +39,14 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
 
     private final ExcelParser parser;
 
+    /** Constructor of the class.
+     * @param parser component responsible for reading data from Excel document.
+     * @throws IllegalArgumentException if given parser is null.
+     */
     public ExcelDatabaseMetaData( ExcelParser parser ) {
+        if( parser == null ) {
+            throw new IllegalArgumentException( "parser must not be null" );
+        }
         this.parser = parser;
     }
 
@@ -87,15 +97,19 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean allProceduresAreCallable() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean allTablesAreSelectable() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -111,33 +125,43 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isReadOnly() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean nullsAreSortedHigh() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean nullsAreSortedLow() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean nullsAreSortedAtStart() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean nullsAreSortedAtEnd() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -183,51 +207,67 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsMixedCaseIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean storesUpperCaseIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean storesLowerCaseIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean storesMixedCaseIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -279,171 +319,227 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsAlterTableWithAddColumn() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsAlterTableWithDropColumn() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsColumnAliasing() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean nullPlusNonNullIsNull() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsConvert() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsConvert( int fromType, int toType ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsTableCorrelationNames() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsExpressionsInOrderBy() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsOrderByUnrelated() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsGroupBy() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsGroupByUnrelated() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsGroupByBeyondSelect() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsLikeEscapeClause() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsMultipleResultSets() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsMultipleTransactions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsNonNullableColumns() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsMinimumSQLGrammar() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsCoreSQLGrammar() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsExtendedSQLGrammar() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsANSI92EntryLevelSQL() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsANSI92IntermediateSQL() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsANSI92FullSQL() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsOuterJoins() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsFullOuterJoins() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsLimitedOuterJoins() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getSchemaTerm() throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -459,9 +555,11 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isCatalogAtStart() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -471,81 +569,107 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSchemasInDataManipulation() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSchemasInProcedureCalls() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSchemasInTableDefinitions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsCatalogsInDataManipulation() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsCatalogsInProcedureCalls() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsCatalogsInTableDefinitions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsPositionedDelete() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsPositionedUpdate() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSelectForUpdate() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -555,240 +679,321 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSubqueriesInComparisons() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSubqueriesInExists() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSubqueriesInIns() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsCorrelatedSubqueries() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsUnion() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsUnionAll() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxBinaryLiteralLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxCharLiteralLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxColumnNameLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxColumnsInGroupBy() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxColumnsInIndex() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxColumnsInOrderBy() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxColumnsInSelect() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxColumnsInTable() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxConnections() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxCursorNameLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxIndexLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxSchemaNameLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxProcedureNameLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxCatalogNameLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxRowSize() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxStatementLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxStatements() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxTableNameLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxTablesInSelect() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxUserNameLength() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDefaultTransactionIsolation() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return Connection.TRANSACTION_NONE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsTransactions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsTransactionIsolationLevel( int level ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsDataDefinitionAndDataManipulationTransactions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsDataManipulationTransactionsOnly() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getProcedures( String catalog, String schemaPattern, String procedureNamePattern ) throws SQLException {
         List<String> columnNames = Arrays.asList( "PROCEDURE_CAT", "PROCEDURE_SCHEM", "PROCEDURE_NAME", //
@@ -818,6 +1023,9 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return new ExcelDatabaseResultSet( columnNames, allRows );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getProcedureColumns( String catalog, String schemaPattern, String procedureNamePattern, String columnNamePattern ) throws SQLException {
         List<String> columnNames = Arrays.asList( "PROCEDURE_CAT", "PROCEDURE_SCHEM", "PROCEDURE_NAME", "COLUMN_NAME", "COLUMN_TYPE", //
@@ -946,75 +1154,99 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsResultSetType( int type ) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return type == ResultSet.TYPE_FORWARD_ONLY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsResultSetConcurrency( int type, int concurrency ) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return type == ResultSet.TYPE_FORWARD_ONLY && concurrency == ResultSet.CONCUR_READ_ONLY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean ownUpdatesAreVisible( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean ownDeletesAreVisible( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean ownInsertsAreVisible( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean othersUpdatesAreVisible( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean othersDeletesAreVisible( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean othersInsertsAreVisible( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updatesAreDetected( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deletesAreDetected( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean insertsAreDetected( int type ) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsBatchUpdates() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1030,27 +1262,35 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsSavepoints() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsNamedParameters() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsMultipleOpenResults() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsGetGeneratedKeys() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1120,9 +1360,11 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsStatementPooling() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1138,15 +1380,19 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1174,9 +1420,11 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean generatedKeyAlwaysReturned() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 

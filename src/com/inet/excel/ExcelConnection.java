@@ -36,12 +36,21 @@ import java.util.concurrent.Executor;
 
 import com.inet.excel.parser.ExcelParser;
 
+/** Connection intended to be returned by {@link ExcelDriver} in order to read data from Excel documents.
+ */
 public class ExcelConnection implements Connection {
 
     private final ExcelParser parser;
     private boolean closed;
 
+    /** Constructor of the class.
+     * @param parser component responsible for reading data from Excel document.
+     * @throws IllegalArgumentException if given parser is null.
+     */
     public ExcelConnection( ExcelParser parser ) {
+        if( parser == null ) {
+            throw new IllegalArgumentException( "parser must not be null" );
+        }
         this.parser = parser;
         this.closed = false;
     }
@@ -122,28 +131,37 @@ public class ExcelConnection implements Connection {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setAutoCommit( boolean autoCommit ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean getAutoCommit() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void commit() throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void rollback() throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
     /**
@@ -162,252 +180,362 @@ public class ExcelConnection implements Connection {
         return closed;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setReadOnly( boolean readOnly ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isReadOnly() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setCatalog( String catalog ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCatalog() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTransactionIsolation( int level ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getTransactionIsolation() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clearWarnings() throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Statement createStatement( int resultSetType, int resultSetConcurrency ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PreparedStatement prepareStatement( String sql, int resultSetType, int resultSetConcurrency ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CallableStatement prepareCall( String sql, int resultSetType, int resultSetConcurrency ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTypeMap( Map<String, Class<?>> map ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setHoldability( int holdability ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getHoldability() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Savepoint setSavepoint() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Savepoint setSavepoint( String name ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void rollback( Savepoint savepoint ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void releaseSavepoint( Savepoint savepoint ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Statement createStatement( int resultSetType, int resultSetConcurrency, int resultSetHoldability ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PreparedStatement prepareStatement( String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CallableStatement prepareCall( String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PreparedStatement prepareStatement( String sql, int autoGeneratedKeys ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PreparedStatement prepareStatement( String sql, int[] columnIndexes ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PreparedStatement prepareStatement( String sql, String[] columnNames ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Clob createClob() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Blob createBlob() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NClob createNClob() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SQLXML createSQLXML() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid( int timeout ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setClientInfo( String name, String value ) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
-
+        throw new SQLClientInfoException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setClientInfo( Properties properties ) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
-
+        throw new SQLClientInfoException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getClientInfo( String name ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Properties getClientInfo() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Array createArrayOf( String typeName, Object[] elements ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Struct createStruct( String typeName, Object[] attributes ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSchema( String schema ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getSchema() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void abort( Executor executor ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setNetworkTimeout( Executor executor, int milliseconds ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNetworkTimeout() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
-    
+
     /** Throws exception if connection is already closed.
      * @throws SQLException if connection is already closed.
      */
