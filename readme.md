@@ -1,4 +1,5 @@
 [![Build](https://github.com/i-net-software/ExcelJConnect/actions/workflows/build.yml/badge.svg)](https://github.com/i-net-software/ExcelJConnect/actions/workflows/build.yml)
+[![JitPack](https://jitpack.io/v/i-net-software/ExcelJConnect.svg)](https://jitpack.io/#i-net-software/ExcelJConnect/master-SNAPSHOT)
 
 A Excel driver (*.xlsx) written completely in Java (pure Java).
 
