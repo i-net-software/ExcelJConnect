@@ -100,6 +100,13 @@ public abstract class ExcelResultSet implements ResultSet {
         throw new SQLException( "Data may not be updated using this result set" );
     }
 
+    /** Throws exception indicating that operation is not allowed on result set of type {@link ResultSet#TYPE_FORWARD_ONLY}.
+     * @throws SQLException exception indicating that operation is not allowed on result set of type {@link ResultSet#TYPE_FORWARD_ONLY}.
+     */
+    protected void throwExceptionDueToResultSetType() throws SQLException {
+        throw new SQLException( "Operation is not allowed on result set of type \"TYPE_FORWARD_ONLY\"" );
+    }
+
     /** Returns list of column names.
      * @return list of column names.
      */
@@ -229,21 +236,30 @@ public abstract class ExcelResultSet implements ResultSet {
         return getValue( columnIndex );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputStream getAsciiStream( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputStream getUnicodeStream( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputStream getBinaryStream( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -319,9 +335,12 @@ public abstract class ExcelResultSet implements ResultSet {
         return getValue( columnIndex );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BigDecimal getBigDecimal( String columnLabel, int scale ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -361,39 +380,52 @@ public abstract class ExcelResultSet implements ResultSet {
         return getValue( columnIndex );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputStream getAsciiStream( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputStream getUnicodeStream( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputStream getBinaryStream( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clearWarnings() throws SQLException {
-        // TODO Auto-generated method stub
-
+        // nothing to do
     }
 
     @Override
     public String getCursorName() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -462,94 +494,132 @@ public abstract class ExcelResultSet implements ResultSet {
         return getValue( columnIndex );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isBeforeFirst() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isFirst() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isLast() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void beforeFirst() throws SQLException {
-        // TODO Auto-generated method stub
-
+        throwExceptionDueToResultSetType();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void afterLast() throws SQLException {
-        // TODO Auto-generated method stub
-
+        throwExceptionDueToResultSetType();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean first() throws SQLException {
-        // TODO Auto-generated method stub
+        throwExceptionDueToResultSetType();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean last() throws SQLException {
-        // TODO Auto-generated method stub
+        throwExceptionDueToResultSetType();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean absolute( int row ) throws SQLException {
-        // TODO Auto-generated method stub
+        throwExceptionDueToResultSetType();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean relative( int rows ) throws SQLException {
-        // TODO Auto-generated method stub
+        throwExceptionDueToResultSetType();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean previous() throws SQLException {
-        // TODO Auto-generated method stub
+        throwExceptionDueToResultSetType();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setFetchDirection( int direction ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getFetchDirection() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return ResultSet.FETCH_FORWARD;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setFetchSize( int rows ) throws SQLException {
-        // TODO Auto-generated method stub
-
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getFetchSize() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getType() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return ResultSet.TYPE_FORWARD_ONLY;
     }
 
     /**
@@ -560,21 +630,27 @@ public abstract class ExcelResultSet implements ResultSet {
         return CONCUR_READ_ONLY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean rowUpdated() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean rowInserted() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean rowDeleted() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -906,10 +982,12 @@ public abstract class ExcelResultSet implements ResultSet {
         throwExceptionDueToConcurrencyMode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void refreshRow() throws SQLException {
-        // TODO Auto-generated method stub
-
+        throwExceptionDueToResultSetType();
     }
 
     /**
@@ -936,117 +1014,174 @@ public abstract class ExcelResultSet implements ResultSet {
         throwExceptionDueToConcurrencyMode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Statement getStatement() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getObject( int columnIndex, Map<String, Class<?>> map ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Ref getRef( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Blob getBlob( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Clob getClob( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Array getArray( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getObject( String columnLabel, Map<String, Class<?>> map ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Ref getRef( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Blob getBlob( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Clob getClob( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Array getArray( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Date getDate( int columnIndex, Calendar cal ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Date getDate( String columnLabel, Calendar cal ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Time getTime( int columnIndex, Calendar cal ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Time getTime( String columnLabel, Calendar cal ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Timestamp getTimestamp( int columnIndex, Calendar cal ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Timestamp getTimestamp( String columnLabel, Calendar cal ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public URL getURL( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public URL getURL( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -1114,15 +1249,21 @@ public abstract class ExcelResultSet implements ResultSet {
         throwExceptionDueToConcurrencyMode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RowId getRowId( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RowId getRowId( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -1142,10 +1283,13 @@ public abstract class ExcelResultSet implements ResultSet {
         throwExceptionDueToConcurrencyMode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getHoldability() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        throwIfAlreadyClosed();
+        return ResultSet.HOLD_CURSORS_OVER_COMMIT;
     }
 
     /**
@@ -1180,27 +1324,39 @@ public abstract class ExcelResultSet implements ResultSet {
         throwExceptionDueToConcurrencyMode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NClob getNClob( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NClob getNClob( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SQLXML getSQLXML( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SQLXML getSQLXML( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -1220,27 +1376,39 @@ public abstract class ExcelResultSet implements ResultSet {
         throwExceptionDueToConcurrencyMode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getNString( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getNString( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Reader getNCharacterStream( int columnIndex ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Reader getNCharacterStream( String columnLabel ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -1468,9 +1636,12 @@ public abstract class ExcelResultSet implements ResultSet {
         throwExceptionDueToConcurrencyMode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T getObject( int columnIndex, Class<T> type ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 

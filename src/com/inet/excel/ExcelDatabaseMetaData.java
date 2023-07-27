@@ -113,15 +113,21 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getURL() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUserName() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -165,45 +171,60 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDatabaseProductVersion() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDriverName() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return ExcelDriver.DRIVER_NAME;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDriverVersion() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return getDriverMajorVersion() + "." + getDriverMinorVersion();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDriverMajorVersion() {
-        // TODO Auto-generated method stub
-        return 0;
+        return ExcelDriver.MAJOR_VERSION;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDriverMinorVersion() {
-        // TODO Auto-generated method stub
-        return 0;
+        return ExcelDriver.MINOR_VERSION;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean usesLocalFiles() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean usesLocalFilePerTable() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -271,51 +292,74 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getIdentifierQuoteString() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return " ";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getSQLKeywords() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getNumericFunctions() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getStringFunctions() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getSystemFunctions() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getTimeDateFunctions() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getSearchStringEscape() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getExtraNameCharacters() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -543,15 +587,21 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getProcedureTerm() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCatalogTerm() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -563,9 +613,12 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCatalogSeparator() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -673,10 +726,12 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsStoredProcedures() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     /**
@@ -1076,81 +1131,120 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return new ExcelDatabaseResultSet( columnNames, allRows );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getSchemas() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getCatalogs() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getTableTypes() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getColumnPrivileges( String catalog, String schema, String table, String columnNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getTablePrivileges( String catalog, String schemaPattern, String tableNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getBestRowIdentifier( String catalog, String schema, String table, int scope, boolean nullable ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getVersionColumns( String catalog, String schema, String table ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getPrimaryKeys( String catalog, String schema, String table ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getImportedKeys( String catalog, String schema, String table ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getExportedKeys( String catalog, String schema, String table ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getCrossReference( String parentCatalog, String parentSchema, String parentTable, String foreignCatalog, String foreignSchema, String foreignTable ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getTypeInfo() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getIndexInfo( String catalog, String schema, String table, boolean unique, boolean approximate ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -1250,15 +1344,21 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getUDTs( String catalog, String schemaPattern, String typeNamePattern, int[] types ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Connection getConnection() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -1294,69 +1394,101 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getSuperTypes( String catalog, String schemaPattern, String typeNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getSuperTables( String catalog, String schemaPattern, String tableNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getAttributes( String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsResultSetHoldability( int holdability ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getResultSetHoldability() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDatabaseMajorVersion() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDatabaseMinorVersion() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getJDBCMajorVersion() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getJDBCMinorVersion() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getSQLStateType() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean locatorsUpdateCopy() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1368,15 +1500,21 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RowIdLifetime getRowIdLifetime() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getSchemas( String catalog, String schemaPattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
@@ -1396,27 +1534,39 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getClientInfoProperties() throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getFunctions( String catalog, String schemaPattern, String functionNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getFunctionColumns( String catalog, String schemaPattern, String functionNamePattern, String columnNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResultSet getPseudoColumns( String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern ) throws SQLException {
-        // TODO Auto-generated method stub
+        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
