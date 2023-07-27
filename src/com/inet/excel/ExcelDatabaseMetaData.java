@@ -176,7 +176,6 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getDatabaseProductVersion() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 

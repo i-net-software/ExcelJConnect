@@ -210,8 +210,7 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public String getCatalog() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return parser.getFileName();
     }
 
     /**
@@ -507,7 +506,6 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public String getSchema() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
         return null;
     }
 
