@@ -58,6 +58,14 @@ publishing {
                         url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
+                 developers {
+                    developer {
+                        id = 'HardworkingMarek'
+                        name = 'Marek'
+                        organization = 'i-net software'
+                        organizationUrl = 'https://www.inetsoftware.de'
+                    }
+                }
                 scm {
                     connection = 'scm:git:git@github.com:i-net-software/ExcelJConnect.git'
                     developerConnection = 'scm:git:git@github.com:i-net-software/ExcelJConnect.git'
