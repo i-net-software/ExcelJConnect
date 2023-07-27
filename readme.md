@@ -3,6 +3,19 @@
 
 A Excel driver (*.xlsx) written completely in Java (pure Java).
 
+## Dependencies ##
+No dependencies to other libraries are needed.
+
+```
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'de.inetsoftware:exceljconnect:+'
+}
+```
+
 ## Usage ##
 
 ```java
