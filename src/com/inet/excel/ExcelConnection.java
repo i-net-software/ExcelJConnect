@@ -193,8 +193,8 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public boolean isReadOnly() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return false;
+        throwIfAlreadyClosed();
+        return true;
     }
 
     /**
@@ -226,8 +226,8 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public int getTransactionIsolation() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return 0;
+        throwIfAlreadyClosed();
+        return Connection.TRANSACTION_NONE;
     }
 
     /**
@@ -235,7 +235,7 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
+        throwIfAlreadyClosed();
         return null;
     }
 
@@ -244,7 +244,8 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public void clearWarnings() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
+        throwIfAlreadyClosed();
+        // nothing to do
     }
 
     /**
@@ -437,8 +438,7 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public boolean isValid( int timeout ) throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return false;
+        return !isClosed();
     }
 
     /**
@@ -506,6 +506,7 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public String getSchema() throws SQLException {
+        throwIfAlreadyClosed();
         return null;
     }
 
@@ -530,7 +531,7 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public int getNetworkTimeout() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
+        throwIfAlreadyClosed();
         return 0;
     }
 
