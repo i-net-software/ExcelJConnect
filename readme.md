@@ -1,4 +1,5 @@
 [![Build](https://github.com/i-net-software/ExcelJConnect/actions/workflows/build.yml/badge.svg)](https://github.com/i-net-software/ExcelJConnect/actions/workflows/build.yml)
+[![License](https://img.shields.io/github/license/i-net-software/ExcelJConnect.svg)](https://github.com/i-net-software/ExcelJConnect/blob/master/LICENSE)
 [![Maven](https://img.shields.io/maven-central/v/de.inetsoftware/exceljconnect.svg)](https://mvnrepository.com/artifact/de.inetsoftware/exceljconnect)
 [![JitPack](https://jitpack.io/v/i-net-software/ExcelJConnect.svg)](https://jitpack.io/#i-net-software/ExcelJConnect/master-SNAPSHOT)
 
