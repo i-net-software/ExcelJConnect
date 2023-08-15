@@ -457,7 +457,7 @@ public abstract class ExcelResultSet implements ResultSet {
                 return index + 1;
             }
         }
-        throw new SQLException( "ResultSet: unknown column \"" + columnLabel + "" );
+        throw new SQLException( "ResultSet: unknown column \"" + columnLabel + "\"." );
     }
 
     /**
