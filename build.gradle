@@ -91,3 +91,7 @@ signing {
     required { project.hasProperty("signing.keyId") }
     sign publishing.publications.maven
 }
+
+test {
+    useJUnitPlatform()
+}
