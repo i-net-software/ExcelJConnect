@@ -107,12 +107,12 @@ class ExcelDriverTest {
 
     @Test
     public void getMajorVersion_should_return_current_major_version() {
-        assertEquals( 1, newDriver().getMajorVersion() );
+        assertEquals( ExcelDriver.MAJOR_VERSION, newDriver().getMajorVersion() );
     }
 
     @Test
     public void getMinorVersion_should_return_current_minor_version() {
-        assertEquals( 0, newDriver().getMinorVersion() );
+        assertEquals( ExcelDriver.MINOR_VERSION, newDriver().getMinorVersion() );
     }
 
     @Test
