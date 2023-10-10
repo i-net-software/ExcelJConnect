@@ -46,7 +46,7 @@ public class ExcelParserTest {
     @Test
     public void getFileName_returns_name_taken_from_filePath() {
         boolean hasHeaderRow = true; // irrelevant for this test
-        assertEquals( "abcd.xlsx", new ExcelParser( Paths.get( "C:\\folder\\abcd.xlsx" ), hasHeaderRow ).getFileName() );
+        assertEquals( "abcd.xlsx", new ExcelParser( Paths.get( "C:" + File.separator + "folder" + File.separator + "abcd.xlsx" ), hasHeaderRow ).getFileName() );
         assertEquals( "zxc.xlsx", new ExcelParser( Paths.get( "zxc.xlsx" ), hasHeaderRow ).getFileName() );
     }
 
