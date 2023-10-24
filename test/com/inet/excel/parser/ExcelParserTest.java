@@ -27,6 +27,11 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -230,25 +235,22 @@ public class ExcelParserTest {
     }
 
     @Test
-    public void getRows_returns_data_of_various_types() {
+    public void getRows_returns_data_of_various_types() throws ParseException {
         File resource = new File( ExcelParserTest.class.getResource( "./files/various_data_types.xlsx" ).getPath() );
         ExcelParser parser = new ExcelParser( resource.toPath(), false );
 
-        List<List<String>> expectedRows = asList( asList( "125" ), // $125.0000 
+        List<List<Object>> expectedRows = asList( asList( "125" ), // $125.0000 
                                                   asList( "222" ), // 222
                                                   asList( "333" ), // 333.00
                                                   asList( "444" ), // $444.00
                                                   asList( "555" ), // $555.00 
-                                                  asList( "45220" ), // 10/21/2023
-                                                  asList( "47837" ), // Friday, December 20, 2030
-                                                  asList( "0.51388888888888895" ), // 12:20:00 PM
                                                   asList( "1.1000000000000001" ), // 110.00%
                                                   asList( "2.4" ), // 2 2/5
                                                   asList( "10" ), // 1.00E+01
                                                   asList( "#DIV/0!" ), // #DIV/0!
                                                   asList( "555" ) ); // 555.00
 
-        assertEquals( expectedRows, parser.getRows( "Sheet1", 1, 13 ) );
+        assertEquals( expectedRows, parser.getRows( "Sheet1", 1, 10 ) );
     }
 
     @Test
@@ -311,5 +313,30 @@ public class ExcelParserTest {
     @Test
     public void getRowCount_throws_exception_if_workbook_does_not_include_specified_sheet() {
         method_throws_exception_if_sheet_is_invalid( "nonExistingSheetName", (parser,sheetName) -> parser.getRowCount( sheetName ) );
+    }
+
+    @Test
+    public void values_representing_date_or_time_are_provided_as_instances_of_time_or_date_or_timestamp() throws ParseException {
+        String sheetName = "Sheet1";
+        File resource = new File( ExcelParserTest.class.getResource( "./files/dates.xlsx" ).getPath() );
+        ExcelParser parser = new ExcelParser( resource.toPath(), false );
+
+        List<Object> row1 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy" ).parse( "3/17/1915" ).getTime() ), "", "", "" );
+        List<Object> row2 = asList( new Date( new SimpleDateFormat( "MM/dd/yyyy" ).parse( "4/16/1921" ).getTime() ), "", "", "" );
+        List<Object> row3 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy hh:mm:ss a" ).parse( "5/17/1927 12:00:00 PM" ).getTime() ), "", "", "" );
+        List<Object> row4 = asList( "5/17/1927 12:00:00 PM", "", "", "" ); // cell contains text
+        assertEquals( asList( row1, row2, row3, row4 ), parser.getRows( sheetName, 1, 4 ) );
+
+        long millis = new SimpleDateFormat( "MM/dd/yyyy" ).parse( "10/1/2024" ).getTime();
+        Date date = new Date( millis );
+        Timestamp timestamp = new Timestamp( millis );
+        Time time = new Time( millis );
+
+        for( int rowIndex = 5; rowIndex <= 8; rowIndex++ ) {
+            String msg = "row " + rowIndex;
+            assertEquals( asList( asList( date, date, date, date ) ), parser.getRows( sheetName, rowIndex, rowIndex ), msg );
+        }
+        assertEquals( asList( asList( date, timestamp, timestamp, timestamp ) ), parser.getRows( sheetName, 9, 9 ) );
+        assertEquals( asList( asList( time, time, time, time ) ), parser.getRows( sheetName, 10, 10 ) );
     }
 }

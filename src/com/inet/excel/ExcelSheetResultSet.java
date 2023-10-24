@@ -31,7 +31,7 @@ public class ExcelSheetResultSet extends ExcelResultSet {
     private final ResultSetMetaData metaData;
     private final int rowCount;
 
-    private List<List<String>> rowBatch;
+    private List<List<Object>> rowBatch;
     private int currentRowIndex;
     private int currentBatchIndex;
     private boolean closed;

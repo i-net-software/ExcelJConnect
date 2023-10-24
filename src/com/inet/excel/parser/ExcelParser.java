@@ -18,13 +18,19 @@ package com.inet.excel.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
@@ -40,14 +46,15 @@ import com.inet.excel.parser.RowData.CellData;
  */
 public class ExcelParser {
 
-    private final XMLInputFactory factory = XMLInputFactory.newInstance();
-    private final Path filePath;
-    private final boolean hasHeaderRow;
+    private final XMLInputFactory       factory                 = XMLInputFactory.newInstance();
+    private final Path                  filePath;
+    private final boolean               hasHeaderRow;
 
-    private List<String> sharedStrings = null;
-    private Map<String, String> sheetNamesToPaths = null;
-    private Map<String, SheetDimension> sheetNamesToDimensions = new HashMap<>();
-    private Map<String, List<String>> sheetNamesToColumnNames = new HashMap<>();
+    private List<String>                sharedStrings                  = null;
+    private Map<String, String>         sheetNamesToPaths              = null;
+    private List<ValueType>             valueTypesOrderedByStyleIdexes = null;
+    private Map<String, SheetDimension> sheetNamesToDimensions         = new HashMap<>();
+    private Map<String, List<String>>   sheetNamesToColumnNames        = new HashMap<>();
 
     /** Creates instance responsible for reading data from specified Excel document.
      * @param filePath file path to Excel document.
@@ -140,7 +147,7 @@ public class ExcelParser {
      * @throws IllegalArgumentException if one of specified indexes is smaller than 1; if first index is greater than last index.
      * @throws ExcelParserException in case of I/O or processing errors.
      */
-    public List<List<String>> getRows( String sheetName, int firstRowIndex, int lastRowIndex ) {
+    public List<List<Object>> getRows( String sheetName, int firstRowIndex, int lastRowIndex ) {
         if( firstRowIndex < 1 ) {
             throw new IllegalArgumentException( "firstRowIndex must be greater than zero" );
         }
@@ -153,6 +160,7 @@ public class ExcelParser {
 
         try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
             initSheetData( zipFile );
+            initStyles( zipFile );
             initDimensionAndColumnNames( zipFile, sheetName );
             if( hasHeaderRow ) {
                 // should skip header row
@@ -173,7 +181,6 @@ public class ExcelParser {
         if( sheetNamesToPaths != null ) {
             return;
         }
-        sheetNamesToPaths = new HashMap<>();
 
         try {
             Map<String, String> sheetRelIdToName = new HashMap<>();
@@ -203,6 +210,8 @@ public class ExcelParser {
             try( InputStream is = zipFile.getInputStream( relsEntry ) ) {
                 XMLStreamReader reader = factory.createXMLStreamReader( is );
                 try {
+                    Map<String, String> map = new HashMap<>();
+
                     Set<String> sheetRelIds = new HashSet<>( sheetRelIdToName.keySet() );
                     while( !sheetRelIds.isEmpty() && reader.hasNext() ) {
                         reader.next();
@@ -217,10 +226,12 @@ public class ExcelParser {
                                     String msg = "Relationship of sheet \"" + sheetName + "\" must include attribute \"Target\".";
                                     throw new ExcelParserException( new IllegalStateException( msg ) );
                                 }
-                                sheetNamesToPaths.put( sheetName, "xl/" + target );
+                                map.put( sheetName, "xl/" + target );
                             }
                         }
                     }
+
+                    sheetNamesToPaths = map;
                 } finally {
                     reader.close();
                 }
@@ -238,20 +249,130 @@ public class ExcelParser {
         if( sharedStrings != null ) {
             return;
         }
-        sharedStrings = new ArrayList<>();
 
         ZipEntry sheetEntry = zipFile.getEntry( "xl/sharedStrings.xml" );
         try( InputStream is = zipFile.getInputStream( sheetEntry ) ) {
             XMLStreamReader reader = factory.createXMLStreamReader( is );
             try {
+                List<String> list = new ArrayList<>();
+
                 while( reader.hasNext() ) {
                     reader.next();
                     if( reader.getEventType() == XMLStreamReader.START_ELEMENT ) {
                         String localName = reader.getLocalName();
                         if( "t".equals( localName ) ) {
-                            sharedStrings.add( reader.getElementText() );
+                            list.add( reader.getElementText() );
                         }
                     }
+                }
+
+                sharedStrings = list;
+            } finally {
+                reader.close();
+            }
+        } catch( XMLStreamException | IOException ex ) {
+            throw new ExcelParserException( ex );
+        }
+    }
+
+    /** Initializes list of value types defined for cells with specific styles, if these are not already loaded.
+     * @param zipFile component allowing access to data inside Excel document.
+     * @throws ExcelParserException in case of I/O or processing errors.
+     */
+    private void initStyles( ZipFile zipFile ) {
+        if( valueTypesOrderedByStyleIdexes != null ) {
+            return;
+        }
+
+        ZipEntry sheetEntry = zipFile.getEntry( "xl/styles.xml" );
+        try( InputStream is = zipFile.getInputStream( sheetEntry ) ) {
+            XMLStreamReader reader = factory.createXMLStreamReader( is );
+            try {
+
+                boolean insideNumFmts = false; //NOTE: just in case of some invalid documents ("numFmt" should appear inside "numFmts")
+                Map<String, String> numFmtIdToFormatCode = new HashMap<>();
+
+                boolean insideCellXfs = false; //NOTE: important to check because "xf" appears inside "cellStyleXfs" and "cellXfs"
+                List<String> numFmtIdsFromCellXfs = new ArrayList<>();
+
+                while( reader.hasNext() ) {
+                    reader.next();
+                    if( reader.getEventType() == XMLStreamReader.START_ELEMENT ) {
+                        String localName = reader.getLocalName();
+                        if( localName == null ) {
+                            continue;
+                        }
+                        switch( localName ) {
+                            case "numFmts":
+                                insideNumFmts = true;
+                                break;
+                            case "numFmt":
+                                if( !insideNumFmts ) {
+                                    break;
+                                }
+                                String numFmtId = reader.getAttributeValue( null, "numFmtId" );
+                                if( numFmtId != null ) {
+                                    String formatCode = reader.getAttributeValue( null, "formatCode" );
+                                    if( formatCode == null ) {
+                                        formatCode = "";
+                                    }
+                                    numFmtIdToFormatCode.put( numFmtId, formatCode );
+                                }
+                                break;
+                            case "cellXfs":
+                                insideCellXfs = true;
+                                break;
+                            case "xf":
+                                if( !insideCellXfs ) {
+                                    break;
+                                }
+                                String id = reader.getAttributeValue( null, "numFmtId" );
+                                if( id == null ) {
+                                    id = "unknown"; //NOTE: in case of invalid document, add dummy value to the list to preserve order of occurrence
+                                }
+                                numFmtIdsFromCellXfs.add( id );
+                                break;
+                        }
+                    } else if( reader.getEventType() == XMLStreamReader.END_ELEMENT ) {
+                        String localName = reader.getLocalName();
+                        switch( localName ) {
+                            case "numFmts":
+                                insideNumFmts = false;
+                                break;
+                            case "cellXfs":
+                                insideCellXfs = false;
+                                break;
+                        }
+                    }
+                }
+                valueTypesOrderedByStyleIdexes = new ArrayList<>();
+
+                for( int styleIndex = 0; styleIndex < numFmtIdsFromCellXfs.size(); styleIndex++ ) {
+                    String id = numFmtIdsFromCellXfs.get( styleIndex );
+                    try {
+                        int intID = Integer.parseInt( id );
+                        switch( intID ) {
+                            case 14:
+                            case 22:
+                                valueTypesOrderedByStyleIdexes.add( ValueType.TIMESTAMP );
+                                continue;
+                            case 15:
+                            case 16:
+                            case 17:
+                                valueTypesOrderedByStyleIdexes.add( ValueType.DATE );
+                                continue;
+                            case 18:
+                            case 19:
+                            case 20:
+                            case 21:
+                                valueTypesOrderedByStyleIdexes.add( ValueType.TIME );
+                                continue;
+                        }
+                    } catch( NumberFormatException ex ) {
+                        // ignore
+                    }
+                    String formatCode = numFmtIdToFormatCode.getOrDefault( id, "" );
+                    valueTypesOrderedByStyleIdexes.add( FormatCodeAnalyzer.recognizeValueType( formatCode ) );
                 }
             } finally {
                 reader.close();
@@ -382,7 +503,7 @@ public class ExcelParser {
                     List<String> columnNames = generateColumnNames( sheetDimension.getFirstColumnIndex(), sheetDimension.getLastColumnIndex() );
 
                     for( CellData cell : headerData.getCellsInRow() ) { // NOTE: relevant only if hasHeaderRow is true
-                        String value = getCellValue( zipFile, cell );
+                        Object value = getCellValue( zipFile, cell );
                         if( value == null ) {
                             continue;
                         }
@@ -390,7 +511,7 @@ public class ExcelParser {
                         if( columnIndex > 0 ) { // ensures that cell ref is valid
                             columnIndex -= sheetDimension.getFirstColumnIndex();
                             if( columnIndex >= 0 && columnIndex < columnNames.size() ) {
-                                columnNames.set( columnIndex, value );
+                                columnNames.set( columnIndex, value.toString() );
                             }
                         }
                     }
@@ -428,7 +549,7 @@ public class ExcelParser {
      * @return list of rows from specified range.
      * @throws ExcelParserException in case of I/O or processing errors.
      */
-    private List<List<String>> readRows( ZipFile zipFile, String sheetName, int firstRowIndex, int lastRowIndex ) {
+    private List<List<Object>> readRows( ZipFile zipFile, String sheetName, int firstRowIndex, int lastRowIndex ) {
         try {
             ZipEntry sheetEntry = getZipEntryForSheet( zipFile, sheetName );
             try( InputStream is = zipFile.getInputStream( sheetEntry ) ) {
@@ -438,9 +559,9 @@ public class ExcelParser {
                     int columnCount = sheetNamesToColumnNames.get( sheetName ).size();
                     SheetDimension sheetDimension = sheetNamesToDimensions.get( sheetName );
 
-                    List<List<String>> allRows = new ArrayList<>();
+                    List<List<Object>> allRows = new ArrayList<>();
                     IntStream.range( 0, requestedRowCount ).forEach( val -> {
-                        List<String> row = new ArrayList<>();
+                        List<Object> row = new ArrayList<>();
                         IntStream.range( 0, columnCount ).forEach( v -> row.add( "" ) );
                         allRows.add( row );
                     } );
@@ -486,10 +607,10 @@ public class ExcelParser {
                             String localName = reader.getLocalName();
                             if( "row".equals( localName ) ) {
                                 if( currentRowData != null ) {
-                                    List<String> row = allRows.get( currentRowData.getRowIndex() - firstRowIndex );
+                                    List<Object> row = allRows.get( currentRowData.getRowIndex() - firstRowIndex );
 
                                     for( CellData cell : currentRowData.getCellsInRow() ) {
-                                        String value = getCellValue( zipFile, cell );
+                                        Object value = getCellValue( zipFile, cell );
                                         if( value == null ) {
                                             continue;
                                         }
@@ -522,7 +643,7 @@ public class ExcelParser {
      * @param cell container with data of the cell.
      * @return value of specified cell or null, in case of invalid data.
      */
-    private String getCellValue( ZipFile zipFile, CellData cell ) {
+    private Object getCellValue( ZipFile zipFile, CellData cell ) {
         if( "s".equals( cell.getT() ) ) {
             try {
                 int index = Integer.parseInt( cell.getV() );
@@ -532,8 +653,35 @@ public class ExcelParser {
                 return null;
             }
         } else {
-            // NOTE: place for possible future improvements: cell value formatting
-            return cell.getV();
+            try {
+                int styleIndex = Integer.parseInt( cell.getS() );
+
+                Function<CellData, Long> toMillis = cellData -> {
+                    double value = Double.parseDouble( cellData.getV() );
+                    int days = Double.valueOf( value ).intValue();
+                    int seconds = Long.valueOf( Math.round( (value - days) * TimeUnit.DAYS.toSeconds( 1 ) ) ).intValue();
+
+                    Calendar cal = Calendar.getInstance();
+                    days--; // because value 0 represents "0 January 1900" in excel
+                    cal.set( 1900, 0, days, 0, 0, seconds );
+                    cal.set( Calendar.MILLISECOND, 0 );
+                    return new Long( cal.getTime().getTime() );
+                };
+
+                switch( valueTypesOrderedByStyleIdexes.get( styleIndex ) ) {
+                    case DATE:
+                        return new Date( toMillis.apply( cell ).longValue() );
+                    case TIME:
+                        return new Time( toMillis.apply( cell ).longValue() );
+                    case TIMESTAMP:
+                        return new Timestamp( toMillis.apply( cell ).longValue() );
+                    case VARCHAR:
+                    default:
+                        return cell.getV();
+                }
+            } catch( NumberFormatException | IndexOutOfBoundsException ex ) {
+                return cell.getV(); // fallback to string
+            }
         }
     }
 

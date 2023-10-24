@@ -269,7 +269,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public String getString( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getString( columnIndex );
     }
 
     /**
@@ -278,7 +278,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public boolean getBoolean( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getBoolean( columnIndex );
     }
 
     /**
@@ -287,7 +287,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public byte getByte( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getByte( columnIndex );
     }
 
     /**
@@ -296,7 +296,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public short getShort( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getShort( columnIndex );
     }
 
     /**
@@ -305,7 +305,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public int getInt( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getInt( columnIndex );
     }
 
     /**
@@ -314,7 +314,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public long getLong( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getLong( columnIndex );
     }
 
     /**
@@ -323,7 +323,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public float getFloat( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getFloat( columnIndex );
     }
 
     /**
@@ -332,7 +332,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public double getDouble( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getDouble( columnIndex );
     }
 
     /**
@@ -350,7 +350,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public byte[] getBytes( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getBytes( columnIndex );
     }
 
     /**
@@ -359,7 +359,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public Date getDate( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getDate( columnIndex );
     }
 
     /**
@@ -368,7 +368,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public Time getTime( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getTime( columnIndex );
     }
 
     /**
@@ -377,7 +377,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public Timestamp getTimestamp( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getTimestamp( columnIndex );
     }
 
     /**
@@ -443,7 +443,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public Object getObject( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getObject( columnIndex );
     }
 
     /**
@@ -474,7 +474,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public Reader getCharacterStream( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getCharacterStream( columnIndex );
     }
 
     /**
@@ -491,7 +491,7 @@ public abstract class ExcelResultSet implements ResultSet {
     @Override
     public BigDecimal getBigDecimal( String columnLabel ) throws SQLException {
         int columnIndex = findColumn( columnLabel );
-        return getValue( columnIndex );
+        return getBigDecimal( columnIndex );
     }
 
     /**

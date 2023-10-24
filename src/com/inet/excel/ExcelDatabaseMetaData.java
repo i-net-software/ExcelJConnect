@@ -33,7 +33,7 @@ import com.inet.excel.parser.ExcelParser;
  */
 public class ExcelDatabaseMetaData implements DatabaseMetaData {
 
-    public static final int VARCHAR_COLUMN_SIZE_IN_BYTES = 65535;
+    public static final int COLUMN_SIZE_IN_BYTES = 65535;
 
     public static final String PRODUCT_NAME = "inetexcel";
 
@@ -1104,18 +1104,18 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
                     row.add( sheetName );
                     row.add( colName );
                     row.add( Integer.valueOf( DatabaseMetaData.procedureColumnResult ) );
-                    row.add( Integer.valueOf( Types.VARCHAR ) );
-                    row.add( "VARCHAR" );
+                    row.add( Integer.valueOf( Types.JAVA_OBJECT ) );
+                    row.add( "JAVA_OBJECT" );
                     row.add( Integer.valueOf( 0 ) );
-                    row.add( Integer.valueOf( VARCHAR_COLUMN_SIZE_IN_BYTES ) );
-                    row.add( Integer.valueOf( VARCHAR_COLUMN_SIZE_IN_BYTES ) );
+                    row.add( Integer.valueOf( COLUMN_SIZE_IN_BYTES ) );
+                    row.add( Integer.valueOf( COLUMN_SIZE_IN_BYTES ) );
                     row.add( null );
                     row.add( Integer.valueOf( DatabaseMetaData.procedureNoNulls ) );
                     row.add( "" );
                     row.add( "" );
                     row.add( null );
                     row.add( null );
-                    row.add( Integer.valueOf( VARCHAR_COLUMN_SIZE_IN_BYTES ) );
+                    row.add( Integer.valueOf( COLUMN_SIZE_IN_BYTES ) );
                     row.add( Integer.valueOf( colIndex ) );
                     row.add( "NO" );
                     row.add( sheetName );

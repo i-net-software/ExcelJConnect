@@ -160,7 +160,7 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
      */
     @Override
     public int getPrecision( int column ) throws SQLException {
-        return ExcelDatabaseMetaData.VARCHAR_COLUMN_SIZE_IN_BYTES;
+        return ExcelDatabaseMetaData.COLUMN_SIZE_IN_BYTES;
     }
 
     /**
@@ -192,7 +192,7 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
      */
     @Override
     public int getColumnType( int column ) throws SQLException {
-        return Types.VARCHAR;
+        return Types.JAVA_OBJECT;
     }
 
     /**
@@ -200,7 +200,7 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
      */
     @Override
     public String getColumnTypeName( int column ) throws SQLException {
-        return "VARCHAR";
+        return "JAVA_OBJECT";
     }
 
     /**
@@ -232,6 +232,6 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
      */
     @Override
     public String getColumnClassName( int column ) throws SQLException {
-        return String.class.getName();
+        return String.class.getName(); //TODO
     }
 }
