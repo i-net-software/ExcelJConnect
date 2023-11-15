@@ -1,9 +1,13 @@
 plugins {
   id 'maven-publish'
   id 'signing'
+  id 'java'
 }
 
-apply plugin: 'java'
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 repositories {
     mavenCentral()
