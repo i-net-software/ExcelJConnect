@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.inet.excel.parser.ExcelParser;
+import com.inet.excel.parser.ValueType;
 
 /** Class for result set used to retrieve data of the sheet from Excel document.
  */
@@ -50,7 +51,8 @@ public class ExcelSheetResultSet extends ExcelResultSet {
         this.parser = parser;
         this.sheetName = sheetName;
         this.maxRowsPerBatch = maxRowsPerBatch;
-        this.metaData = new ExcelSheetResultSetMetaData( parser.getFileName(), sheetName, getColumnNames() );
+        List<ValueType> columnTypes = parser.getColumnTypes( sheetName );
+        this.metaData = new ExcelSheetResultSetMetaData( parser.getFileName(), sheetName, getColumnNames(), columnTypes );
         this.rowCount = parser.getRowCount( sheetName );
         this.currentRowIndex = -1;
         this.currentBatchIndex = -1;

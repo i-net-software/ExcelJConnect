@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
+import com.inet.excel.parser.ValueType;
+
 /** Implementation of {@link ResultSetMetaData} for {@link ExcelSheetResultSet}.
  */
 public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
@@ -27,14 +29,16 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
     private String fileName;
     private String sheetName;
     private List<String> columnNames;
+    private List<ValueType> columnTypes;
 
     /** Constructor of the class.
      * @param fileName file name of the Excel document.
      * @param sheetName name of the sheet from Excel document.
      * @param columnNames list of column names.
+     * @param columnTypes list of column types.
      * @throws IllegalArgumentException if any of given arguments is null.
      */
-    public ExcelSheetResultSetMetaData( String fileName, String sheetName, List<String> columnNames ) {
+    public ExcelSheetResultSetMetaData( String fileName, String sheetName, List<String> columnNames, List<ValueType> columnTypes ) {
         if( fileName == null ) {
             throw new IllegalArgumentException( "file name must not be null" );
         }
@@ -44,9 +48,13 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
         if( columnNames == null ) {
             throw new IllegalArgumentException( "list of column names must not be null" );
         }
+        if( columnTypes == null ) {
+            throw new IllegalArgumentException( "list of column types must not be null" );
+        }
         this.fileName = fileName;
         this.sheetName = sheetName;
         this.columnNames = columnNames;
+        this.columnTypes = columnTypes;
     }
 
     /**
@@ -112,7 +120,7 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
      */
     @Override
     public int isNullable( int column ) throws SQLException {
-        return columnNoNulls;
+        return columnNullable;
     }
 
     /**
@@ -192,7 +200,8 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
      */
     @Override
     public int getColumnType( int column ) throws SQLException {
-        return Types.JAVA_OBJECT;
+        ValueType valueType = columnTypes.get( column - 1 );
+        return ExcelDatabaseMetaData.getDataType( valueType );
     }
 
     /**
@@ -200,7 +209,8 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
      */
     @Override
     public String getColumnTypeName( int column ) throws SQLException {
-        return "JAVA_OBJECT";
+        ValueType valueType = columnTypes.get( column - 1 );
+        return ExcelDatabaseMetaData.getDataTypeName( valueType );
     }
 
     /**
@@ -232,6 +242,19 @@ public class ExcelSheetResultSetMetaData implements ResultSetMetaData {
      */
     @Override
     public String getColumnClassName( int column ) throws SQLException {
-        return String.class.getName(); //TODO
+        ValueType valueType = columnTypes.get( column - 1 );
+        switch( valueType ) {
+            case DATE:
+                return java.util.Date.class.getName();
+            case NUMBER:
+                return Double.class.getName();
+            case TIME:
+                return java.sql.Time.class.getName();
+            case TIMESTAMP:
+                return java.sql.Timestamp.class.getName();
+            case VARCHAR:
+            default:
+                return String.class.getName();
+        }
     }
 }

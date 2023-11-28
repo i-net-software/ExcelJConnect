@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.inet.excel.parser.ExcelParser;
+import com.inet.excel.parser.ValueType;
 
 /** Implementation of {@link ResultSetMetaData} for {@link ExcelConnection}
  */
@@ -48,6 +49,48 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
             throw new IllegalArgumentException( "parser must not be null" );
         }
         this.parser = parser;
+    }
+
+    /** Returns constant value that identifies the generic SQL type matching specified {@link ValueType}.
+     * @param type type to return constant value for. Must not be null.
+     * @return constant value that identifies the generic SQL type matching specified {@link ValueType}.
+     */
+    static int getDataType( ValueType type ) {
+        switch( type ) {
+            case DATE:
+                return Types.DATE;
+            case NUMBER:
+                return Types.NUMERIC;
+            case TIME:
+                return Types.TIME;
+            case TIMESTAMP:
+                return Types.TIMESTAMP;
+            case VARCHAR:
+                return Types.VARCHAR;
+            default:
+                return Types.JAVA_OBJECT;
+        }
+    }
+
+    /** Returns name that identifies the generic SQL type matching specified {@link ValueType}.
+     * @param type type to return constant value for. Must not be null.
+     * @return name that identifies the generic SQL type matching specified {@link ValueType}.
+     */
+    static String getDataTypeName( ValueType type ) {
+        switch( type ) {
+            case DATE:
+                return "DATE";
+            case NUMBER:
+                return "NUMERIC";
+            case TIME:
+                return "TIME";
+            case TIMESTAMP:
+                return "TIMESTAMP";
+            case VARCHAR:
+                return "VARCHAR";
+            default:
+                return "JAVA_OBJECT";
+        }
     }
 
     /**
@@ -1094,8 +1137,11 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
                     continue;
                 }
 
+                List<ValueType> columnTypes = parser.getColumnTypes( sheetName );
                 int colIndex = 0;
                 for( String colName : parser.getColumnNames( sheetName ) ) {
+                    ValueType valueType = columnTypes.get( colIndex );
+
                     colIndex++; // indexing starts with 1
 
                     List<Object> row = new ArrayList<>();
@@ -1104,20 +1150,20 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
                     row.add( sheetName );
                     row.add( colName );
                     row.add( Integer.valueOf( DatabaseMetaData.procedureColumnResult ) );
-                    row.add( Integer.valueOf( Types.JAVA_OBJECT ) );
-                    row.add( "JAVA_OBJECT" );
+                    row.add( Integer.valueOf( getDataType( valueType ) ) );
+                    row.add( getDataTypeName( valueType ) );
                     row.add( Integer.valueOf( 0 ) );
                     row.add( Integer.valueOf( COLUMN_SIZE_IN_BYTES ) );
                     row.add( Integer.valueOf( COLUMN_SIZE_IN_BYTES ) );
                     row.add( null );
-                    row.add( Integer.valueOf( DatabaseMetaData.procedureNoNulls ) );
+                    row.add( Integer.valueOf( DatabaseMetaData.procedureNullable ) );
                     row.add( "" );
                     row.add( "" );
                     row.add( null );
                     row.add( null );
                     row.add( Integer.valueOf( COLUMN_SIZE_IN_BYTES ) );
                     row.add( Integer.valueOf( colIndex ) );
-                    row.add( "NO" );
+                    row.add( "YES" );
                     row.add( sheetName );
 
                     allRows.add( row );

@@ -24,22 +24,27 @@ import org.junit.jupiter.api.Test;
 public class ExcelSheetResultSetMetaDataTest {
 
     @Test
-    public void constructor_should_accept_empty_list_as_columnNames() {
-        new ExcelSheetResultSetMetaData( "fileName.xlsx", "Sheet1", new ArrayList<>() );
+    public void constructor_should_accept_empty_list_as_columnNames_and_columnTypes() {
+        new ExcelSheetResultSetMetaData( "fileName.xlsx", "Sheet1", new ArrayList<>(), new ArrayList<>() );
     }
 
     @Test
     public void constructor_throws_exception_if_fileName_is_null() {
-        assertThrows( IllegalArgumentException.class, () -> new ExcelSheetResultSetMetaData( null, "Sheet1", new ArrayList<>() ) );
+        assertThrows( IllegalArgumentException.class, () -> new ExcelSheetResultSetMetaData( null, "Sheet1", new ArrayList<>(), new ArrayList<>() ) );
     }
 
     @Test
     public void constructor_throws_exception_if_sheetName_is_null() {
-        assertThrows( IllegalArgumentException.class, () -> new ExcelSheetResultSetMetaData( "fileName.xlsx", null, new ArrayList<>() ) );
+        assertThrows( IllegalArgumentException.class, () -> new ExcelSheetResultSetMetaData( "fileName.xlsx", null, new ArrayList<>(), new ArrayList<>() ) );
     }
 
     @Test
     public void constructor_throws_exception_if_columnNames_are_null() {
-        assertThrows( IllegalArgumentException.class, () -> new ExcelSheetResultSetMetaData( "fileName.xlsx", "Sheet1", null ) );
+        assertThrows( IllegalArgumentException.class, () -> new ExcelSheetResultSetMetaData( "fileName.xlsx", "Sheet1", null, new ArrayList<>() ) );
+    }
+
+    @Test
+    public void constructor_throws_exception_if_columnTypes_are_null() {
+        assertThrows( IllegalArgumentException.class, () -> new ExcelSheetResultSetMetaData( "fileName.xlsx", "Sheet1", new ArrayList<>(), null ) );
     }
 }

@@ -183,15 +183,15 @@ public class ExcelParserTest {
 
     @Test
     public void getRows_returns_data_from_specified_rows_of_document_without_header_row() {
-        List<String> emptyRow = asList( "", "", "", "", "" );
+        List<String> emptyRow = asList( null, null, null, null, null );
 
         List<String> row1 = asList( "Red", "Black", "Green", "Yellow", "Blue" );
-        List<String> row2 = asList( "Cat", "", "Dog", "Bird", "" );
-        List<String> row3 = asList( "", "Flower", "Garden", "Tree", "Soil" );
+        List<String> row2 = asList( "Cat", null, "Dog", "Bird", null );
+        List<String> row3 = asList( null, "Flower", "Garden", "Tree", "Soil" );
         List<String> row4 = emptyRow;
-        List<String> row5 = asList( "Fire", "", "Ice", "", "Water" );
-        List<String> row6 = asList( "Sun", "", "", "", "" );
-        List<String> row7 = asList( "", "", "", "", "Moon" );
+        List<String> row5 = asList( "Fire", null, "Ice", null, "Water" );
+        List<String> row6 = asList( "Sun", null, null, null, null );
+        List<String> row7 = asList( null, null, null, null, "Moon" );
         List<String> row8 = asList( "One", "Two", "Three", "Four", "Five" );
 
         String sheetName = "Sheet1";
@@ -210,14 +210,14 @@ public class ExcelParserTest {
 
     @Test
     public void getRows_returns_data_from_specified_rows_of_document_with_header_row() {
-        List<String> emptyRow = asList( "", "", "", "", "" );
+        List<String> emptyRow = asList( null, null, null, null, null );
 
-        List<String> row1 = asList( "Cat", "", "Dog", "Bird", "" );
-        List<String> row2 = asList( "", "Flower", "Garden", "Tree", "Soil" );
+        List<String> row1 = asList( "Cat", null, "Dog", "Bird", null );
+        List<String> row2 = asList( null, "Flower", "Garden", "Tree", "Soil" );
         List<String> row3 = emptyRow;
-        List<String> row4 = asList( "Fire", "", "Ice", "", "Water" );
-        List<String> row5 = asList( "Sun", "", "", "", "" );
-        List<String> row6 = asList( "", "", "", "", "Moon" );
+        List<String> row4 = asList( "Fire", null, "Ice", null, "Water" );
+        List<String> row5 = asList( "Sun", null, null, null, null );
+        List<String> row6 = asList( null, null, null, null, "Moon" );
         List<String> row7 = asList( "One", "Two", "Three", "Four", "Five" );
 
         String sheetName = "Sheet1";
@@ -321,10 +321,10 @@ public class ExcelParserTest {
         File resource = new File( ExcelParserTest.class.getResource( "./files/dates.xlsx" ).getPath() );
         ExcelParser parser = new ExcelParser( resource.toPath(), false );
 
-        List<Object> row1 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy" ).parse( "3/17/1915" ).getTime() ), "", "", "" );
-        List<Object> row2 = asList( new Date( new SimpleDateFormat( "MM/dd/yyyy" ).parse( "4/16/1921" ).getTime() ), "", "", "" );
-        List<Object> row3 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy hh:mm:ss a" ).parse( "5/17/1927 12:00:00 PM" ).getTime() ), "", "", "" );
-        List<Object> row4 = asList( "5/17/1927 12:00:00 PM", "", "", "" ); // cell contains text
+        List<Object> row1 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy" ).parse( "3/17/1915" ).getTime() ), null, null, null );
+        List<Object> row2 = asList( new Date( new SimpleDateFormat( "MM/dd/yyyy" ).parse( "4/16/1921" ).getTime() ), null, null, null );
+        List<Object> row3 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy hh:mm:ss a" ).parse( "5/17/1927 12:00:00 PM" ).getTime() ), null, null, null );
+        List<Object> row4 = asList( "5/17/1927 12:00:00 PM", null, null, null ); // cell contains text
         assertEquals( asList( row1, row2, row3, row4 ), parser.getRows( sheetName, 1, 4 ) );
 
         long millis = new SimpleDateFormat( "MM/dd/yyyy" ).parse( "10/1/2024" ).getTime();
@@ -338,5 +338,34 @@ public class ExcelParserTest {
         }
         assertEquals( asList( asList( date, timestamp, timestamp, timestamp ) ), parser.getRows( sheetName, 9, 9 ) );
         assertEquals( asList( asList( time, time, time, time ) ), parser.getRows( sheetName, 10, 10 ) );
+    }
+
+    @Test
+    public void getColumnTypes_throws_exception_if_excel_file_does_not_exist() {
+        method_throws_exception_if_excel_file_does_not_exist( parser -> parser.getColumnTypes( "sheetName" ) );
+    }
+
+    @Test
+    public void getColumnTypes_throws_exception_if_sheet_is_null() {
+        method_throws_exception_if_sheet_is_invalid( null, (parser,sheetName) -> parser.getColumnTypes( sheetName ) );
+    }
+
+    @Test
+    public void getColumnTypes_throws_exception_if_workbook_does_not_include_specified_sheet() {
+        method_throws_exception_if_sheet_is_invalid( "nonExistingSheetName", (parser,sheetName) -> parser.getColumnTypes( sheetName ) );
+    }
+
+    @Test
+    public void getColumnTypes_returns_value_types_for_columns_from_specified_sheet() {
+        File resource = new File( ExcelParserTest.class.getResource( "./files/column_types.xlsx" ).getPath() );
+        ExcelParser parser = new ExcelParser( resource.toPath(), true );
+
+        assertEquals( asList( ValueType.NUMBER, ValueType.DATE, ValueType.TIME, ValueType.TIMESTAMP, ValueType.NUMBER, ValueType.VARCHAR ), parser.getColumnTypes( "SingleType" ) );
+
+        assertEquals( asList( ValueType.VARCHAR, ValueType.VARCHAR, ValueType.VARCHAR, ValueType.VARCHAR, ValueType.NUMBER, ValueType.NUMBER, ValueType.VARCHAR, ValueType.NUMBER ), parser.getColumnTypes( "MixedTypes" ) );
+
+        assertEquals( asList( ValueType.VARCHAR, ValueType.DATE ), parser.getColumnTypes( "CellLimit" ) );
+
+        assertEquals( asList( ValueType.VARCHAR, ValueType.VARCHAR, ValueType.DATE ), parser.getColumnTypes( "RowLimit" ) );
     }
 }

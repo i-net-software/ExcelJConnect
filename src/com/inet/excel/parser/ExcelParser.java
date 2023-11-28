@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -46,15 +48,16 @@ import com.inet.excel.parser.RowData.CellData;
  */
 public class ExcelParser {
 
-    private final XMLInputFactory       factory                 = XMLInputFactory.newInstance();
-    private final Path                  filePath;
-    private final boolean               hasHeaderRow;
+    private final XMLInputFactory        factory                         = XMLInputFactory.newInstance();
+    private final Path                   filePath;
+    private final boolean                hasHeaderRow;
 
-    private List<String>                sharedStrings                  = null;
-    private Map<String, String>         sheetNamesToPaths              = null;
-    private List<ValueType>             valueTypesOrderedByStyleIdexes = null;
-    private Map<String, SheetDimension> sheetNamesToDimensions         = new HashMap<>();
-    private Map<String, List<String>>   sheetNamesToColumnNames        = new HashMap<>();
+    private List<String>                 sharedStrings                   = null;
+    private Map<String, String>          sheetNamesToPaths               = null;
+    private List<ValueType>              valueTypesOrderedByStyleIndexes = null;
+    private Map<String, SheetDimension>  sheetNamesToDimensions          = new HashMap<>();
+    private Map<String, List<String>>    sheetNamesToColumnNames         = new HashMap<>();
+    private Map<String, List<ValueType>> sheetNamesToColumnTypes         = new HashMap<>();
 
     /** Creates instance responsible for reading data from specified Excel document.
      * @param filePath file path to Excel document.
@@ -114,6 +117,25 @@ public class ExcelParser {
         try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
             initSheetData( zipFile );
             return sheetNamesToPaths.entrySet().stream().sorted( Map.Entry.comparingByValue() ).map( Map.Entry::getKey ).collect( Collectors.toList() );
+        } catch( IOException ex ) {
+            throw new ExcelParserException( ex );
+        }
+    }
+
+    /** Returns list of column types from specified sheet.
+     * It probes limited number of cells belonging to columns in order to recognize their common value type.
+     * In case of columns with values of mixed types, it takes {@link ValueType#VARCHAR} as column's type.
+     * @param sheetName name of the sheet from Excel document.
+     * @return list of column types from specified sheet.
+     * @throws ExcelParserException in case of I/O or processing errors.
+     */
+    public List<ValueType> getColumnTypes( String sheetName ) {
+        try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
+            initSheetData( zipFile );
+            initStyles( zipFile );
+            initDimensionAndColumnNames( zipFile, sheetName );
+            initColumnTypes( zipFile, sheetName );
+            return Collections.unmodifiableList( sheetNamesToColumnTypes.get( sheetName ) );
         } catch( IOException ex ) {
             throw new ExcelParserException( ex );
         }
@@ -280,7 +302,7 @@ public class ExcelParser {
      * @throws ExcelParserException in case of I/O or processing errors.
      */
     private void initStyles( ZipFile zipFile ) {
-        if( valueTypesOrderedByStyleIdexes != null ) {
+        if( valueTypesOrderedByStyleIndexes != null ) {
             return;
         }
 
@@ -345,7 +367,7 @@ public class ExcelParser {
                         }
                     }
                 }
-                valueTypesOrderedByStyleIdexes = new ArrayList<>();
+                valueTypesOrderedByStyleIndexes = new ArrayList<>();
 
                 for( int styleIndex = 0; styleIndex < numFmtIdsFromCellXfs.size(); styleIndex++ ) {
                     String id = numFmtIdsFromCellXfs.get( styleIndex );
@@ -354,25 +376,25 @@ public class ExcelParser {
                         switch( intID ) {
                             case 14:
                             case 22:
-                                valueTypesOrderedByStyleIdexes.add( ValueType.TIMESTAMP );
+                                valueTypesOrderedByStyleIndexes.add( ValueType.TIMESTAMP );
                                 continue;
                             case 15:
                             case 16:
                             case 17:
-                                valueTypesOrderedByStyleIdexes.add( ValueType.DATE );
+                                valueTypesOrderedByStyleIndexes.add( ValueType.DATE );
                                 continue;
                             case 18:
                             case 19:
                             case 20:
                             case 21:
-                                valueTypesOrderedByStyleIdexes.add( ValueType.TIME );
+                                valueTypesOrderedByStyleIndexes.add( ValueType.TIME );
                                 continue;
                         }
                     } catch( NumberFormatException ex ) {
                         // ignore
                     }
                     String formatCode = numFmtIdToFormatCode.getOrDefault( id, "" );
-                    valueTypesOrderedByStyleIdexes.add( FormatCodeAnalyzer.recognizeValueType( formatCode ) );
+                    valueTypesOrderedByStyleIndexes.add( FormatCodeAnalyzer.recognizeValueType( formatCode ) );
                 }
             } finally {
                 reader.close();
@@ -540,6 +562,150 @@ public class ExcelParser {
         return columnNames;
     }
 
+    /** Initializes list of column types from specified sheet.
+     * It probes limited number of cells belonging to columns in order to recognize their common value type.
+     * In case of columns with values of mixed types, it takes {@link ValueType#VARCHAR} as column's type.
+     * @param zipFile component allowing access to data inside Excel document.
+     * @param sheetName name of the sheet from Excel document.
+     * @throws ExcelParserException in case of I/O or processing errors.
+     */
+    private void initColumnTypes( ZipFile zipFile, String sheetName ) {
+        if( sheetNamesToColumnTypes.get( sheetName ) != null ) {
+            return;
+        }
+        try {
+            ZipEntry sheetEntry = getZipEntryForSheet( zipFile, sheetName );
+            try( InputStream is = zipFile.getInputStream( sheetEntry ) ) {
+                XMLStreamReader reader = factory.createXMLStreamReader( is );
+                try {
+                    int columnCount = sheetNamesToColumnNames.get( sheetName ).size();
+                    SheetDimension sheetDimension = sheetNamesToDimensions.get( sheetName );
+
+                    final int probedCellLimit = 10;
+                    final int probedRowLimit = 30;
+
+                    int[] probedCells = new int[columnCount];
+                    ValueType[] valueTypes = new ValueType[columnCount];
+                    int probedRowCount = 0;
+                    boolean insideRow = false;
+
+                    ValueType typeToSet = null;
+                    Optional<Integer> columnIndexOfValueToCheck = Optional.empty(); 
+                    boolean possibleNumber = false;
+
+                    while( reader.hasNext() ) {
+                        reader.next();
+                        if( reader.getEventType() == XMLStreamReader.START_ELEMENT ) {
+                            String localName = reader.getLocalName();
+                            if( localName == null ) {
+                                continue;
+                            }
+                            switch( localName ) {
+                                case "row":
+                                    if( hasHeaderRow ) {
+                                        String rowIndex = reader.getAttributeValue( null, "r" );
+                                        if( "1".equals( rowIndex ) ) {
+                                            break; // skip header row
+                                        }
+                                    }
+                                    insideRow = true;
+                                    break;
+                                case "c":
+                                    if( !insideRow ) {
+                                        break;
+                                    }
+                                    columnIndexOfValueToCheck = Optional.empty();
+                                    possibleNumber = false;
+                                    typeToSet = null;
+
+                                    String cellRef = reader.getAttributeValue( null, "r" );
+                                    int columnIndex = SheetDimension.getColumnIndexFromCellRef( cellRef );
+                                    if( columnIndex > 0 ) { // ensures that cell ref is valid
+                                        columnIndex -= sheetDimension.getFirstColumnIndex();
+                                        if( columnIndex >= 0 && columnIndex < columnCount ) {
+                                            if( probedCells[columnIndex] == probedCellLimit ) {
+                                                break; // probed enough cells
+                                            }
+                                            if( valueTypes[columnIndex] == ValueType.VARCHAR ) {
+                                                break; // already initialized as most general type
+                                            }
+
+                                            columnIndexOfValueToCheck = Optional.of( Integer.valueOf( columnIndex ) );
+
+                                            if( "s".equals( reader.getAttributeValue( null, "t" ) ) ) {
+                                                typeToSet = ValueType.VARCHAR;
+                                            } else {
+                                                try {
+                                                    int styleIndex = Integer.parseInt( reader.getAttributeValue( null, "s" ) );
+                                                    typeToSet = valueTypesOrderedByStyleIndexes.get( styleIndex );
+                                                } catch( NumberFormatException | IndexOutOfBoundsException ex ) {
+                                                    // since style could not be recognized, VARCHAR stays as column's type
+                                                    typeToSet = ValueType.VARCHAR;
+                                                }
+                                                ValueType currentType = valueTypes[columnIndex];
+                                                if( ( currentType == null || currentType == ValueType.NUMBER ) && typeToSet == ValueType.VARCHAR ) {
+                                                    // type of cell value is VARCHAR, but it will check whether value can be parsed as number
+                                                    possibleNumber = true;
+                                                } else if( currentType != null && currentType != typeToSet ) {
+                                                    // column has values of various types so it will set VARCHAR as column type
+                                                    typeToSet = ValueType.VARCHAR;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case "v":
+                                    if( columnIndexOfValueToCheck.isPresent() ) {
+                                        String value = reader.getElementText();
+                                        if( value == null || value.trim().isEmpty() ) {
+                                            break;
+                                        }
+                                        int colIndex = columnIndexOfValueToCheck.get().intValue();
+
+                                        if( possibleNumber ) {
+                                            try {
+                                                Double.parseDouble( value );
+                                                typeToSet = ValueType.NUMBER;
+                                            } catch( NullPointerException | NumberFormatException ex ) {
+                                                typeToSet = ValueType.VARCHAR;
+                                            }
+                                            possibleNumber = false;
+                                        } 
+                                        valueTypes[colIndex] = typeToSet;
+                                        probedCells[colIndex]++;
+                                        columnIndexOfValueToCheck = Optional.empty();
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else if( reader.getEventType() == XMLStreamReader.END_ELEMENT ) {
+                            String localName = reader.getLocalName();
+                            if( insideRow && "row".equals( localName ) ) {
+                                insideRow = false;
+                                probedRowCount++;
+                                if( probedRowCount == probedRowLimit ) {
+                                    break; // probed enough rows
+                                }
+                            }
+                        }
+                    }
+
+                    for( int index = 0; index < valueTypes.length; index++ ) {
+                        if( valueTypes[index] == null ) {
+                            valueTypes[index] = ValueType.VARCHAR; // fallback to string
+                        }
+                    }
+                    sheetNamesToColumnTypes.put( sheetName, Arrays.asList( valueTypes ) );
+                } finally {
+                    reader.close();
+                }
+            }
+        } catch( XMLStreamException | IOException ex ) {
+            throw new ExcelParserException( ex );
+        }
+    }
+
     /** Returns list of rows from specified range. Every element in resulting list represents cell values from single row.
      * Resulting list contains data of rows in order of their occurrence in the sheet. Cells with no values are represented as empty strings.
      * @param zipFile component allowing access to data inside Excel document.
@@ -562,7 +728,7 @@ public class ExcelParser {
                     List<List<Object>> allRows = new ArrayList<>();
                     IntStream.range( 0, requestedRowCount ).forEach( val -> {
                         List<Object> row = new ArrayList<>();
-                        IntStream.range( 0, columnCount ).forEach( v -> row.add( "" ) );
+                        IntStream.range( 0, columnCount ).forEach( v -> row.add( null ) );
                         allRows.add( row );
                     } );
 
@@ -653,34 +819,54 @@ public class ExcelParser {
                 return null;
             }
         } else {
+            int styleIndex;
             try {
-                int styleIndex = Integer.parseInt( cell.getS() );
-
-                Function<CellData, Long> toMillis = cellData -> {
-                    double value = Double.parseDouble( cellData.getV() );
-                    int days = Double.valueOf( value ).intValue();
-                    int seconds = Long.valueOf( Math.round( (value - days) * TimeUnit.DAYS.toSeconds( 1 ) ) ).intValue();
-
-                    Calendar cal = Calendar.getInstance();
-                    days--; // because value 0 represents "0 January 1900" in excel
-                    cal.set( 1900, 0, days, 0, 0, seconds );
-                    cal.set( Calendar.MILLISECOND, 0 );
-                    return new Long( cal.getTime().getTime() );
-                };
-
-                switch( valueTypesOrderedByStyleIdexes.get( styleIndex ) ) {
-                    case DATE:
-                        return new Date( toMillis.apply( cell ).longValue() );
-                    case TIME:
-                        return new Time( toMillis.apply( cell ).longValue() );
-                    case TIMESTAMP:
-                        return new Timestamp( toMillis.apply( cell ).longValue() );
-                    case VARCHAR:
-                    default:
-                        return cell.getV();
-                }
-            } catch( NumberFormatException | IndexOutOfBoundsException ex ) {
+                styleIndex = Integer.parseInt( cell.getS() );
+            } catch( Exception ex ) {
                 return cell.getV(); // fallback to string
+            }
+
+            Function<CellData, Long> toMillis = cellData -> {
+                double value = Double.parseDouble( cellData.getV() );
+                int days = Double.valueOf( value ).intValue();
+                int seconds = Long.valueOf( Math.round( (value - days) * TimeUnit.DAYS.toSeconds( 1 ) ) ).intValue();
+
+                Calendar cal = Calendar.getInstance();
+                days--; // because value 0 represents "0 January 1900" in excel
+                cal.set( 1900, 0, days, 0, 0, seconds );
+                cal.set( Calendar.MILLISECOND, 0 );
+                return new Long( cal.getTime().getTime() );
+            };
+
+            ValueType valueType = valueTypesOrderedByStyleIndexes.get( styleIndex );
+            switch( valueType ) {
+                case DATE:
+                    try {
+                        return new Date( toMillis.apply( cell ).longValue() );
+                    } catch( Exception ex ) {
+                        return null;
+                    }
+                case TIME:
+                    try {
+                        return new Time( toMillis.apply( cell ).longValue() );
+                    } catch( Exception ex ) {
+                        return null;
+                    }
+                case TIMESTAMP:
+                    try {
+                        return new Timestamp( toMillis.apply( cell ).longValue() );
+                    } catch( Exception ex ) {
+                        return null;
+                    }
+                case NUMBER:
+                    try {
+                        return Double.valueOf( cell.getV() );
+                    } catch( Exception ex ) {
+                        return null;
+                    }
+                case VARCHAR:
+                default:
+                    return cell.getV();
             }
         }
     }

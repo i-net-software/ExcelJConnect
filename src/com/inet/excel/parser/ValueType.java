@@ -19,5 +19,5 @@ package com.inet.excel.parser;
  */
 public enum ValueType {
 
-    VARCHAR, TIME, DATE, TIMESTAMP
+    VARCHAR, TIME, DATE, TIMESTAMP, NUMBER
 }
