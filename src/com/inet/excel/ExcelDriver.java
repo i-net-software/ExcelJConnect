@@ -35,7 +35,7 @@ public class ExcelDriver implements Driver {
     public static final String URL_PREFIX    = "jdbc:inetexcel:";
     public static final String DRIVER_NAME   = "inetexcel";
     public static final int    MAJOR_VERSION = 1;
-    public static final int    MINOR_VERSION = 3;
+    public static final int    MINOR_VERSION = 4;
 
     /** Throws exception indicating that requested operation is not supported.
      * @throws SQLException exception indicating that requested operation is not supported.

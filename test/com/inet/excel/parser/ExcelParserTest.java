@@ -341,6 +341,16 @@ public class ExcelParserTest {
     }
 
     @Test
+    public void values_representing_numbers_are_provided_as_instances_of_double() {
+        File resource = new File( ExcelParserTest.class.getResource( "./files/numbers.xlsx" ).getPath() );
+        ExcelParser parser = new ExcelParser( resource.toPath(), false );
+
+        List<Object> expectedRow = asList( Double.valueOf( 123 ), Double.valueOf( 456 ), Double.valueOf( 789 ), Double.valueOf( 321 ), Double.valueOf( 55 ), Double.valueOf( 33 ), Double.valueOf( 10 ) );
+
+        assertEquals( asList( expectedRow ), parser.getRows( "Sheet1", 1, 1 ) );
+    }
+
+    @Test
     public void getColumnTypes_throws_exception_if_excel_file_does_not_exist() {
         method_throws_exception_if_excel_file_does_not_exist( parser -> parser.getColumnTypes( "sheetName" ) );
     }

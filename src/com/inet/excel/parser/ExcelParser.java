@@ -102,6 +102,7 @@ public class ExcelParser {
     public List<String> getColumnNames( String sheetName ) {
         try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
             initSheetData( zipFile );
+            initStyles( zipFile );
             initDimensionAndColumnNames( zipFile, sheetName );
             return Collections.unmodifiableList( sheetNamesToColumnNames.get( sheetName ) );
         } catch( IOException ex ) {
@@ -184,6 +185,7 @@ public class ExcelParser {
             initSheetData( zipFile );
             initStyles( zipFile );
             initDimensionAndColumnNames( zipFile, sheetName );
+            initColumnTypes( zipFile, sheetName );
             if( hasHeaderRow ) {
                 // should skip header row
                 firstRowIndex++;
@@ -785,6 +787,14 @@ public class ExcelParser {
                                         if( columnIndex > 0 ) { // ensures that cell ref is valid
                                             columnIndex -= sheetDimension.getFirstColumnIndex();
                                             if( columnIndex >= 0 && columnIndex < columnCount ) {
+                                                ValueType columnType = sheetNamesToColumnTypes.get( sheetName ).get( columnIndex );
+                                                if( value instanceof String && columnType == ValueType.NUMBER ) {
+                                                    try {
+                                                        value = Double.valueOf( (String)value );
+                                                    } catch( Exception ex ) {
+                                                        // fallback to string value
+                                                    }
+                                                }
                                                 row.set( columnIndex, value );
                                             }
                                         }
