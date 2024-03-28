@@ -51,7 +51,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'de.inetsoftware'
             artifactId = 'exceljconnect'
-            version = '1.4'
+            version = '1.5'
             from components.java
             pom {
                 name = 'Excel driver for Java'
