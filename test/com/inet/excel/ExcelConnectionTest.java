@@ -15,14 +15,24 @@
  */
 package com.inet.excel;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
+
+import com.inet.excel.parser.ExcelParser;
 
 public class ExcelConnectionTest {
 
     @Test
     public void constructor_throws_exception_if_parser_is_null() {
-        assertThrows( IllegalArgumentException.class, () -> new ExcelConnection( null ) );
+        assertThrows( IllegalArgumentException.class, () -> new ExcelConnection( null, null ) );
+    }
+
+    @Test
+    public void constructor_accepts_null_as_runnable_to_be_executed_on_connection_close() {
+        ExcelParser parser = new ExcelParser( Paths.get( "" ), false );
+        assertDoesNotThrow( () -> new ExcelConnection( parser, null ) );
     }
 }

@@ -42,16 +42,19 @@ public class ExcelConnection implements Connection {
 
     private final ExcelParser parser;
     private boolean closed;
+    private Runnable onConnectionClose;
 
     /** Constructor of the class.
      * @param parser component responsible for reading data from Excel document.
+     * @param onConnectionClose optional runnable to be executed on connection close.
      * @throws IllegalArgumentException if given parser is null.
      */
-    public ExcelConnection( ExcelParser parser ) {
+    public ExcelConnection( ExcelParser parser, Runnable onConnectionClose ) {
         if( parser == null ) {
             throw new IllegalArgumentException( "parser must not be null" );
         }
         this.parser = parser;
+        this.onConnectionClose = onConnectionClose;
         this.closed = false;
     }
 
@@ -169,6 +172,9 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public void close() throws SQLException {
+        if( !closed && onConnectionClose != null ) {
+            onConnectionClose.run();
+        }
         closed = true;
     }
 

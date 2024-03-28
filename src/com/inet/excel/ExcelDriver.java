@@ -40,7 +40,7 @@ public class ExcelDriver implements Driver {
     public static final String URL_PREFIX    = "jdbc:inetexcel:";
     public static final String DRIVER_NAME   = "inetexcel";
     public static final int    MAJOR_VERSION = 1;
-    public static final int    MINOR_VERSION = 5;
+    public static final int    MINOR_VERSION = 6;
 
     /** Throws exception indicating that requested operation is not supported.
      * @throws SQLException exception indicating that requested operation is not supported.
@@ -87,6 +87,8 @@ public class ExcelDriver implements Driver {
             throw new SQLException( "Excel file is not specified" );
         }
 
+        Runnable onConnectionClose = null;
+
         String lowerCasedFilePath = filePath.toLowerCase();
         String fileProtocol = "file:";
         if( lowerCasedFilePath.startsWith( fileProtocol ) ) {
@@ -109,6 +111,13 @@ public class ExcelDriver implements Driver {
                 Path tempFile = Files.createTempFile( null, null ).toAbsolutePath();
                 Files.copy( in, tempFile, StandardCopyOption.REPLACE_EXISTING );
                 filePath = tempFile.toString();
+                onConnectionClose = () -> {
+                    try {
+                        Files.deleteIfExists( tempFile );
+                    } catch( IOException e ) {
+                        // ignore
+                    }
+                };
             } catch( IOException e ) {
                 throw new SQLException( "An error occurred while accessing the file", e );
             }
@@ -120,7 +129,7 @@ public class ExcelDriver implements Driver {
         }
 
         ExcelParser parser = new ExcelParser( file, hasHeaderRow );
-        return new ExcelConnection( parser );
+        return new ExcelConnection( parser, onConnectionClose );
     }
 
     /**
