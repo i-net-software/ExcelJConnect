@@ -15,9 +15,14 @@
  */
 package com.inet.excel;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
@@ -80,6 +85,33 @@ public class ExcelDriver implements Driver {
 
         if( filePath.trim().isEmpty() ) {
             throw new SQLException( "Excel file is not specified" );
+        }
+
+        String lowerCasedFilePath = filePath.toLowerCase();
+        String fileProtocol = "file:";
+        if( lowerCasedFilePath.startsWith( fileProtocol ) ) {
+            try {
+                URL fileURL = new URL( filePath );
+                String authority = fileURL.getAuthority();
+                if( authority == null || authority.isEmpty() ) {
+                    filePath = new File( fileURL.toURI() ).toString();
+                } else {
+                    filePath = fileURL.getPath();
+                    if( filePath.startsWith( "/" ) ) {
+                        filePath = filePath.substring( 1 );
+                    }
+                }
+            } catch( Exception e ) {
+                filePath = filePath.substring( fileProtocol.length() );
+            }
+        } else if( lowerCasedFilePath.indexOf( ':' ) > 1 ) {
+            try (InputStream in = new URL( filePath ).openStream()) {
+                Path tempFile = Files.createTempFile( null, null ).toAbsolutePath();
+                Files.copy( in, tempFile, StandardCopyOption.REPLACE_EXISTING );
+                filePath = tempFile.toString();
+            } catch( IOException e ) {
+                throw new SQLException( "An error occurred while accessing the file", e );
+            }
         }
 
         Path file = Paths.get( filePath ).toAbsolutePath();

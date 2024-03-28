@@ -77,7 +77,15 @@ class ExcelDriverTest {
     public void connect_returns_connection_to_specified_existing_file() throws IOException, SQLException {
         Path file = Files.createTempFile(  "ExcelDriverTest_" + UUID.randomUUID(), ".xlsx" );
         assertTrue( Files.isRegularFile( file ) ); // precondition check
-        String urlWithPathToExistingFile = ExcelDriver.URL_PREFIX + file.toAbsolutePath().toString();
+        String fileAbsolutePath = file.toAbsolutePath().toString();
+
+        String urlWithPathToExistingFile = ExcelDriver.URL_PREFIX + fileAbsolutePath;
+        assertNotNull( newDriver().connect( urlWithPathToExistingFile, new Properties() ) );
+
+        urlWithPathToExistingFile = ExcelDriver.URL_PREFIX + "file:///" + fileAbsolutePath;
+        assertNotNull( newDriver().connect( urlWithPathToExistingFile, new Properties() ) );
+
+        urlWithPathToExistingFile = ExcelDriver.URL_PREFIX + "file://localhost/" + fileAbsolutePath;
         assertNotNull( newDriver().connect( urlWithPathToExistingFile, new Properties() ) );
     }
 

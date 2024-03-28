@@ -145,7 +145,11 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public boolean getBoolean( int columnIndex ) throws SQLException {
-        return getValue( columnIndex );
+        Boolean value = getValue( columnIndex );
+        if( value == null ) {
+            return false;
+        }
+        return value.booleanValue();
     }
 
     /**
@@ -153,7 +157,11 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public byte getByte( int columnIndex ) throws SQLException {
-        return getValue( columnIndex );
+        Number value = getValue( columnIndex );
+        if( value == null ) {
+            return 0;
+        }
+        return value.byteValue();
     }
 
     /**
@@ -161,7 +169,11 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public short getShort( int columnIndex ) throws SQLException {
-        return getValue( columnIndex );
+        Number value = getValue( columnIndex );
+        if( value == null ) {
+            return 0;
+        }
+        return value.shortValue();
     }
 
     /**
@@ -169,7 +181,11 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public int getInt( int columnIndex ) throws SQLException {
-        return getValue( columnIndex );
+        Number value = getValue( columnIndex );
+        if( value == null ) {
+            return 0;
+        }
+        return value.intValue();
     }
 
     /**
@@ -177,7 +193,11 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public long getLong( int columnIndex ) throws SQLException {
-        return getValue( columnIndex );
+        Number value = getValue( columnIndex );
+        if( value == null ) {
+            return 0;
+        }
+        return value.longValue();
     }
 
     /**
@@ -185,7 +205,11 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public float getFloat( int columnIndex ) throws SQLException {
-        return getValue( columnIndex );
+        Number value = getValue( columnIndex );
+        if( value == null ) {
+            return 0;
+        }
+        return value.floatValue();
     }
 
     /**
@@ -193,7 +217,11 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public double getDouble( int columnIndex ) throws SQLException {
-        return getValue( columnIndex );
+        Number value = getValue( columnIndex );
+        if( value == null ) {
+            return 0;
+        }
+        return value.doubleValue();
     }
 
     /**
