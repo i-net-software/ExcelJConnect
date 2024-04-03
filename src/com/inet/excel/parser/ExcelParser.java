@@ -36,6 +36,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import javax.xml.stream.XMLInputFactory;
@@ -72,18 +73,6 @@ public class ExcelParser {
         this.hasHeaderRow = hasHeaderRow;
     }
 
-    /** Exception that may be thrown when I/O or processing errors occur while reading data from Excel document.
-     */
-    public static class ExcelParserException extends RuntimeException {
-
-        /** Creates new exception with specified cause.
-         * @param cause cause of the exception.
-         */
-        public ExcelParserException( Throwable cause ) {
-            super( cause );
-        }
-    }
-
     /** Returns file name of the Excel document, e.g. "doc.xlsx".
      * @return file name of the Excel document.
      */
@@ -100,7 +89,7 @@ public class ExcelParser {
      * @throws ExcelParserException in case of I/O or processing errors.
      */
     public List<String> getColumnNames( String sheetName ) {
-        try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
+        try( ZipFile zipFile = openExcelDocument( filePath ) ) {
             initSheetData( zipFile );
             initStyles( zipFile );
             initDimensionAndColumnNames( zipFile, sheetName );
@@ -115,7 +104,7 @@ public class ExcelParser {
      * @throws ExcelParserException in case of I/O or processing errors.
      */
     public List<String> getSheetNames() {
-        try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
+        try( ZipFile zipFile = openExcelDocument( filePath ) ) {
             initSheetData( zipFile );
             return sheetNamesToPaths.entrySet().stream().sorted( Map.Entry.comparingByValue() ).map( Map.Entry::getKey ).collect( Collectors.toList() );
         } catch( IOException ex ) {
@@ -131,7 +120,7 @@ public class ExcelParser {
      * @throws ExcelParserException in case of I/O or processing errors.
      */
     public List<ValueType> getColumnTypes( String sheetName ) {
-        try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
+        try( ZipFile zipFile = openExcelDocument( filePath ) ) {
             initSheetData( zipFile );
             initStyles( zipFile );
             initDimensionAndColumnNames( zipFile, sheetName );
@@ -148,7 +137,7 @@ public class ExcelParser {
      * @throws ExcelParserException in case of I/O or processing errors.
      */
     public int getRowCount( String sheetName ) {
-        try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
+        try( ZipFile zipFile = openExcelDocument( filePath ) ) {
             initSheetData( zipFile );
             int rowCount = readRowCount( zipFile, sheetName );
             if( hasHeaderRow ) {
@@ -181,7 +170,7 @@ public class ExcelParser {
             throw new IllegalArgumentException( "firstRowIndex  must be smaller than or equal to lastRowIndex" );
         }
 
-        try( ZipFile zipFile = new ZipFile( filePath.toString() ) ) {
+        try( ZipFile zipFile = openExcelDocument( filePath ) ) {
             initSheetData( zipFile );
             initStyles( zipFile );
             initDimensionAndColumnNames( zipFile, sheetName );
@@ -916,6 +905,20 @@ public class ExcelParser {
             }
         } catch( XMLStreamException | IOException ex ) {
             throw new ExcelParserException( ex );
+        }
+    }
+
+    /** Opens Excel file for reading. In case of invalid Excel file, it throws {@link ExcelParserException} with user friendly message.
+     * @param filePath file path.
+     * @return instance of {@link ZipFile} representing Excel document.
+     * @throws IOException if an I/O error has occurred.
+     * @throws ExcelParserException in case of invalid Excel file.
+     */
+    private ZipFile openExcelDocument( Path filePath ) throws IOException {
+        try {
+            return new ZipFile( filePath.toString() );
+        } catch( ZipException e ) {
+            throw new ExcelParserException( "File is not a valid Excel document." );
         }
     }
 }

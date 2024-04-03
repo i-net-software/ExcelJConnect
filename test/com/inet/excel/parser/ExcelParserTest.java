@@ -15,12 +15,12 @@
  */
 package com.inet.excel.parser;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -37,8 +37,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
-
-import com.inet.excel.parser.ExcelParser.ExcelParserException;
 
 public class ExcelParserTest {
 
