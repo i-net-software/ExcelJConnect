@@ -35,6 +35,7 @@ public class ExcelSheetResultSet extends ExcelResultSet {
     private List<List<Object>> rowBatch;
     private int currentRowIndex;
     private int currentBatchIndex;
+    private boolean wasNull;
     private boolean closed;
 
     /** Constructor of the class.
@@ -56,6 +57,7 @@ public class ExcelSheetResultSet extends ExcelResultSet {
         this.rowCount = parser.getRowCount( sheetName );
         this.currentRowIndex = -1;
         this.currentBatchIndex = -1;
+        this.wasNull = false;
         this.closed = false;
     }
 
@@ -152,7 +154,9 @@ public class ExcelSheetResultSet extends ExcelResultSet {
     protected <T> T getValue( int columnIndex ) throws SQLException {
         throwIfAlreadyClosedOrReachedEnd();
         throwIfColumnIndexIsInvalid( columnIndex );
-        return (T)rowBatch.get( currentBatchIndex ).get( columnIndex - 1 );
+        T value = (T)rowBatch.get( currentBatchIndex ).get( columnIndex - 1 );
+        wasNull = value == null;
+        return value;
     }
 
     /**
@@ -161,6 +165,6 @@ public class ExcelSheetResultSet extends ExcelResultSet {
     @Override
     public boolean wasNull() throws SQLException {
         throwIfAlreadyClosed();
-        return false;
+        return wasNull;
     }
 }
