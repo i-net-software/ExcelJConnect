@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 i-net software
+ * Copyright 2023 - 2024 i-net software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -511,7 +511,11 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public BigDecimal getBigDecimal( int columnIndex ) throws SQLException {
-        return getValue( columnIndex );
+        Object value = getValue( columnIndex );
+        if( value == null ) {
+            return null;
+        }
+        return new BigDecimal( value.toString() );
     }
 
     /**
