@@ -33,6 +33,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -321,7 +322,7 @@ public class ExcelParserTest {
 
         List<Object> row1 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy" ).parse( "3/17/1915" ).getTime() ), null, null, null );
         List<Object> row2 = asList( new Date( new SimpleDateFormat( "MM/dd/yyyy" ).parse( "4/16/1921" ).getTime() ), null, null, null );
-        List<Object> row3 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy hh:mm:ss a" ).parse( "5/17/1927 12:00:00 PM" ).getTime() ), null, null, null );
+        List<Object> row3 = asList( new Timestamp( new SimpleDateFormat( "MM/dd/yyyy hh:mm:ss a", Locale.US ).parse( "5/17/1927 12:00:00 PM" ).getTime() ), null, null, null );
         List<Object> row4 = asList( "5/17/1927 12:00:00 PM", null, null, null ); // cell contains text
         assertEquals( asList( row1, row2, row3, row4 ), parser.getRows( sheetName, 1, 4 ) );
 
