@@ -219,7 +219,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getDatabaseProductVersion() throws SQLException {
-        return null;
+        return ExcelDriver.MAJOR_VERSION + "." + ExcelDriver.MINOR_VERSION;
     }
 
     /**
@@ -347,8 +347,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getSQLKeywords() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return "";
     }
 
     /**
@@ -356,8 +355,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getNumericFunctions() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return "";
     }
 
     /**
@@ -365,8 +363,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getStringFunctions() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return "";
     }
 
     /**
@@ -374,8 +371,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getSystemFunctions() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return "";
     }
 
     /**
@@ -383,8 +379,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getTimeDateFunctions() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return "";
     }
 
     /**
@@ -392,8 +387,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getSearchStringEscape() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return "";
     }
 
     /**
@@ -634,8 +628,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getProcedureTerm() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return "sheet";
     }
 
     /**
@@ -643,8 +636,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public String getCatalogTerm() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return "file";
     }
 
     /**
@@ -1181,8 +1173,8 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public ResultSet getSchemas() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        List<String> columnNames = Arrays.asList( "TABLE_SCHEM", "TABLE_CATALOG" );
+        return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
     /**
@@ -1190,8 +1182,8 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public ResultSet getCatalogs() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        List<String> columnNames = Arrays.asList( "TABLE_CAT" );
+        return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
     /**
@@ -1199,8 +1191,8 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public ResultSet getTableTypes() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        List<String> columnNames = Arrays.asList( "TABLE_TYPE" );
+        return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
     /**
@@ -1280,8 +1272,10 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public ResultSet getTypeInfo() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        List<String> columnNames = Arrays.asList( "TYPE_NAME", "DATA_TYPE", "PRECISION", "LITERAL_PREFIX", "LITERAL_SUFFIX", "CREATE_PARAMS", "NULLABLE", "CASE_SENSITIVE", "SEARCHABLE", //
+                                                  "UNSIGNED_ATTRIBUTE", "FIXED_PREC_SCALE", "AUTO_INCREMENT", "LOCAL_TYPE_NAME", "MINIMUM_SCALE", "MAXIMUM_SCALE", //
+                                                  "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "NUM_PREC_RADIX" );
+        return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
     /**
@@ -1394,8 +1388,8 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public ResultSet getUDTs( String catalog, String schemaPattern, String typeNamePattern, int[] types ) throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        List<String> columnNames = Arrays.asList( "TYPE_CAT", "TYPE_SCHEM", "TYPE_NAME", "CLASS_NAME", "DATA_TYPE", "REMARKS", "BASE_TYPE" );
+        return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
     /**
@@ -1489,8 +1483,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public int getDatabaseMajorVersion() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return 0;
+        return ExcelDriver.MAJOR_VERSION;
     }
 
     /**
@@ -1498,8 +1491,7 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public int getDatabaseMinorVersion() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return 0;
+        return ExcelDriver.MINOR_VERSION;
     }
 
     /**
@@ -1593,8 +1585,8 @@ public class ExcelDatabaseMetaData implements DatabaseMetaData {
      */
     @Override
     public ResultSet getFunctions( String catalog, String schemaPattern, String functionNamePattern ) throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        List<String> columnNames = Arrays.asList( "FUNCTION_CAT", "FUNCTION_SCHEM", "FUNCTION_NAME", "REMARKS", "FUNCTION_TYPE", "SPECIFIC_NAME" );
+        return new ExcelDatabaseResultSet( columnNames, new ArrayList<>() );
     }
 
     /**

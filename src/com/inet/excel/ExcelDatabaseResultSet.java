@@ -17,7 +17,10 @@ package com.inet.excel;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
+
+import com.inet.excel.parser.ValueType;
 
 /** Class for result set used to provide information about available procedures and procedure columns.
  */
@@ -72,8 +75,9 @@ public class ExcelDatabaseResultSet extends ExcelResultSet {
      */
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        List<String> columnNames = getColumnNames();
+        List<ValueType> columnTypes = Collections.nCopies( columnNames.size(), ValueType.VARCHAR );
+        return new ExcelSheetResultSetMetaData( "", "", columnNames, columnTypes );
     }
 
     /**

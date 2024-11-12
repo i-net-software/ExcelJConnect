@@ -147,8 +147,7 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public boolean getAutoCommit() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return false;
+        return true;
     }
 
     /**

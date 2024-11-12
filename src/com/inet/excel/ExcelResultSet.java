@@ -137,7 +137,8 @@ public abstract class ExcelResultSet implements ResultSet {
      */
     @Override
     public String getString( int columnIndex ) throws SQLException {
-        return getValue( columnIndex  );
+        Object value = getValue( columnIndex  );
+        return value != null ? value.toString() : null;
     }
 
     /**
