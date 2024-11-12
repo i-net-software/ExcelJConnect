@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 i-net software
+ * Copyright 2023 - 2024 i-net software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,8 +89,7 @@ public class ExcelConnection implements Connection {
      */
     @Override
     public Statement createStatement() throws SQLException {
-        ExcelDriver.throwExceptionAboutUnsupportedOperation();
-        return null;
+        return new ExcelStatement( parser );
     }
 
     /**
@@ -108,21 +107,7 @@ public class ExcelConnection implements Connection {
     @Override
     public CallableStatement prepareCall( String sql ) throws SQLException {
         throwIfAlreadyClosed();
-
-        String procedureName = null;
-
-        if( sql != null && sql.startsWith( "{call " ) ) {
-            if( sql.endsWith( "()}" ) ) {
-                procedureName = sql.substring( 6, sql.length() - 3 );
-            } else if( sql.endsWith( "}" ) ) {
-                procedureName = sql.substring( 6, sql.length() - 1 );
-            }
-        }
-
-        if( procedureName != null ) {
-            return new ExcelCallableStatement( parser, procedureName );
-        }
-        return null;
+        return new ExcelCallableStatement( parser, sql );
     }
 
     /**
