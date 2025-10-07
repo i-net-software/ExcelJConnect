@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 - 2024 i-net software
+ * Copyright 2023 - 2025 i-net software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,12 +269,21 @@ public class ExcelParser {
             try {
                 List<String> list = new ArrayList<>();
 
+                String text = "";
                 while( reader.hasNext() ) {
                     reader.next();
-                    if( reader.getEventType() == XMLStreamReader.START_ELEMENT ) {
+
+                    int eventType = reader.getEventType();
+                    if( eventType == XMLStreamReader.START_ELEMENT ) {
                         String localName = reader.getLocalName();
                         if( "t".equals( localName ) ) {
-                            list.add( reader.getElementText() );
+                            text += reader.getElementText();
+                        }
+                    } else if( eventType == XMLStreamReader.END_ELEMENT ) {
+                        String localName = reader.getLocalName();
+                        if( "si".equals( localName ) ) {
+                            list.add( text );
+                            text = "";
                         }
                     }
                 }

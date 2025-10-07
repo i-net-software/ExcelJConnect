@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 - 2024 i-net software
+ * Copyright 2023 - 2025 i-net software
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -376,5 +376,20 @@ public class ExcelParserTest {
         assertEquals( asList( ValueType.VARCHAR, ValueType.DATE ), parser.getColumnTypes( "CellLimit" ) );
 
         assertEquals( asList( ValueType.VARCHAR, ValueType.VARCHAR, ValueType.DATE ), parser.getColumnTypes( "RowLimit" ) );
+    }
+
+    @Test
+    public void supports_shared_strings_composed_of_multiple_text_parts() {
+        File resource = new File( ExcelParserTest.class.getResource( "./files/sharedStrings_with_multiple_text_parts.xlsx" ).getPath() );
+
+        // rows
+        ExcelParser parser = new ExcelParser( resource.toPath(), false );
+        List<List<Object>> expectedRows = asList( asList( "one two three", "four five" ),
+                                                  asList( "six seven", "eight nine ten" ) );
+        assertEquals( expectedRows, parser.getRows( "Sheet1", 1, 2 ) );
+
+        // columns
+        parser = new ExcelParser( resource.toPath(), true );
+        assertEquals( asList( "one two three", "four five" ), parser.getColumnNames( "Sheet1" ) );
     }
 }
