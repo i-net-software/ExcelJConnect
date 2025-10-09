@@ -65,6 +65,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             from components.java
+            artifactId = 'exceljconnect'
 
             pom {
                 name = 'Excel driver for Java'
